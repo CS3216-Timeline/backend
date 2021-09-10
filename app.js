@@ -53,4 +53,8 @@ app.use((err, req, res, next) => {
   });
 });
 
+app.get('*', function (req, res) {
+  res.status(404)
+})
+
 app.listen(PORT, () => console.log(`Server started on port ${PORT}`));
