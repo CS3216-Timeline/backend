@@ -1,13 +1,7 @@
-CREATE DATABASE pern_starter;
+CREATE DATABASE cs3216_timeline;
 
 DROP TABLE IF EXISTS users, lines, memories, media;
 
-/*
-    NOTE: not sure if should use an id for primary key instead.
-    Kinda forgot the rationale behind why should not use id as 
-    primary key for CS2102 last time (I took under Yoga), 
-    thought I think for this mod shouldnt really matter.
-*/
 CREATE TABLE users(
     user_id SERIAL PRIMARY KEY,
     email VARCHAR UNIQUE NOT NULL,
