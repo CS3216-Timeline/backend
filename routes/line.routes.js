@@ -16,7 +16,9 @@ router.get("/", auth, async (req, res, next) => {
   const userId = req.userId;
   console.log(userId);
   try {
-    const lines = await lineService.getAllLinesByUserId(userId);
+    const lines = await lineService.getAllLinesByUserIdOrderByMostRecentMemory(
+      userId
+    );
     res.status(200).json({
       lines,
     });
