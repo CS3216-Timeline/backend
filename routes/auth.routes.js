@@ -15,15 +15,6 @@ const UserService = require("../services/UserService");
 const auth = require('../middleware/auth');
 const userService = new UserService();
 
-router.get("/", auth, async (req, res) => {
-  try {
-    const user = await userService.findUserById(req.userId)
-    res.json(user)
-  } catch (err) {
-    next(err)
-  }
-});
-
 // login route
 router.post("/login", [
   check("email", "Please include a valid email").isEmail(),

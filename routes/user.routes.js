@@ -2,13 +2,8 @@ const express = require("express");
 const router = express.Router();
 const config = require('config');
 const jwt = require("jsonwebtoken");
-const {
-  check,
-  validationResult
-} = require("express-validator");
-const {
-  BadRequestError
-} = require("../errors/errors");
+const { check, validationResult } = require("express-validator");
+const { BadRequestError } = require("../errors/errors");
 
 const UserService = require('../services/UserService');
 const userService = new UserService();
