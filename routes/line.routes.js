@@ -34,9 +34,9 @@ router.get("/:lineId", passport.authenticate(['jwt'], { session: false }), async
   const lineId = req.params.lineId;
   try {
     const line = await lineService.getLineByLineId(lineId);
-    if (line.userId == req.user.user_id) {
+    if (line["user_id"] == req.user.user_id) {
       res.status(200).json({
-        lines,
+        line,
       });
     } else {
       next(HTTPError(UnauthorizedError));
