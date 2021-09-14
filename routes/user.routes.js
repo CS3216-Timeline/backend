@@ -7,7 +7,7 @@ const { BadRequestError } = require("../errors/errors");
 
 const UserService = require('../services/UserService');
 const userService = new UserService();
-
+const minPasswordLength = 5
 router.post(
   "/register",
   [
@@ -15,22 +15,24 @@ router.post(
     check("name", "Please fill in your name").not().isEmpty().isString(),
     check(
       "password",
-      "Please enter a password with t or more characters"
+      "Please enter a password with " + minPasswordLength + " or more characters"
     ).isLength({
-      min: 5
+      min: minPasswordLength
     }),
   ],
   async (req, res, next) => {
     const errors = validationResult(req)
-    if (!errors.isEmpty()) {
-      throw new BadRequestError(errors.array().map(err => err.msg).join(', '))
-    }
-    const {
-      email,
-      name,
-      password
-    } = req.body;
     try {
+      if (!errors.isEmpty()) {
+        throw new BadRequestError(errors.array().map(err => err.msg).join(', '))
+      }
+
+      const {
+        email,
+        name,
+        password
+      } = req.body;
+
       const user = await userService.createUser(email, name, password)
 
       const payload = {

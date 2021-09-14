@@ -15,20 +15,43 @@ const UserService = require("../services/UserService");
 const auth = require('../middleware/auth');
 const userService = new UserService();
 
+function generateAccessToken(userId, res) {
+  jwt.sign(
+    {},
+    config.get("jwtSecret"), {
+      expiresIn: 360000,
+      subject: user_id.toString()
+    },
+    (err, token) => {
+      if (err) {
+        throw new UnauthorizedError('user unauthorized');
+      }
+      res.json({
+        token
+      });
+    }
+  );
+}
+
+function generateUserToken(req, res) {
+  generateAccessToken(req.user.user_id, res);
+}
+
 // login route
 router.post("/login", [
   check("email", "Please include a valid email").isEmail(),
-  check("password", "Please is required").exists(),
+  check("password", "Password is required").exists(),
 ], async (req, res, next) => {
   const errors = validationResult(req)
-  if (!errors.isEmpty()) {
-    throw new BadRequestError(errors.array().map(err => err.msg).join(', '))
-  }
-  const {
-    email,
-    password
-  } = req.body;
   try {
+    if (!errors.isEmpty()) {
+      throw new BadRequestError(errors.array().map(err => err.msg).join(', '))
+    }
+
+    const {
+      email,
+      password
+    } = req.body;
 
     // 1. Find out if user with such an email exist
     const user = await userService.findUserByEmail(email);
@@ -41,30 +64,16 @@ router.post("/login", [
       throw new BadRequestError('Incorrect Password');
     }
 
-    const payload = {
-      user: {
-        id: user.user_id,
-      },
-    };
-
-    // returns a token
-    jwt.sign(
-      payload,
-      config.get("jwtSecret"), {
-        expiresIn: 360000
-      },
-      (err, token) => {
-        if (err) {
-          throw new UnauthorizedError('user unauthorized');
-        }
-        res.json({
-          token
-        });
-      }
-    );
+    generateAccessToken(user.user_Id, res)
   } catch (err) {
     next(err)
   }
 });
+
+app.get('/login/google/start',
+  passport.authenticate('google', { session: false, scope: ['openid', 'profile', 'email'] }));
+app.get('/login/google/redirect',
+  passport.authenticate('google', { session: false }),
+  generateUserToken);
 
 module.exports = router;

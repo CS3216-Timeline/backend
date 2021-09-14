@@ -42,7 +42,7 @@ class UserService {
 
   async findUserById(userId) {
     try {
-      const user = await pool.query("SELECT email, name FROM users WHERE user_id = $1", [
+      const user = await pool.query("SELECT user_id, email, name FROM users WHERE user_id = $1", [
         userId
       ]);
       return user.rows[0];
