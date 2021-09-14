@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const auth = require("../middleware/auth");
+const passport = require('passport');
 
 
 router.get("/auth", passport.authenticate(['jwt'], { session: false }), async (req, res, next) => {

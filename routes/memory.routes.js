@@ -3,6 +3,7 @@ const router = express.Router();
 const { check, validationResult } = require("express-validator");
 const { BadRequestError } = require("../errors/errors");
 const auth = require("../middleware/auth");
+const passport = require('passport');
 const MemoryService = require("../services/MemoryService");
 const memoryService = new MemoryService();
 

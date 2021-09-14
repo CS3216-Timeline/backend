@@ -78,10 +78,7 @@ router.post(
   }
 );
 
-app.get('/login/google/start',
-  passport.authenticate('google', { session: false, scope: ['openid', 'profile', 'email'] }));
-app.get('/login/google/redirect',
-  passport.authenticate('google', { session: false }),
-  generateUserToken);
+router.get('/login/google/start', passport.authenticate('google', { session: false, scope: ['openid', 'profile', 'email'] }));
+router.get('/login/google/redirect', passport.authenticate('google', { session: false }), generateUserToken);
 
 module.exports = router;
