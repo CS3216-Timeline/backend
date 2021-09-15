@@ -107,12 +107,13 @@ const facebookAuth = passport.authenticate("facebook-token", {
 });
 
 const fbLogin = (req, res, next) => {
-  if (request.user) {
+  if (req.user) {
     console.log("Successful login via Facebook.");
-    console.log(request.authInfo)
+    console.log(req.authInfo)
     console.log("_____________________")
-    console.log(request.user.user_id)
-    generateAccessToken(request.user.user_id, res);
+    console.log(req.user.user_id)
+    generateAccessToken(req.user.user_id, res);
+    // generateAccessToken(req.authInfo.user_id, res);
   }
 };
 
