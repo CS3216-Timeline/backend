@@ -1,5 +1,5 @@
 const { Strategy: JwtStrategy, ExtractJwt } = require('passport-jwt');
-const passportGoogle = require('passport-google-oauth');
+const FacebookTokenStrategy = require("passport-facebook-token");
 const config = require('config');
 const UserService = require('../services/UserService');
 require('dotenv').config()
@@ -26,26 +26,27 @@ const jwtVerify = async (payload, done) => {
   }
 };
 
-const googleOptions = {
-  clientID: process.env.GOOGLE_APP_ID,
-  clientSecret: process.env.GOOGLE_APP_SECRET,
-  callbackURL: 'http://localhost:5000/api/login/google/redirect' //TODO: Abstract out base url
-};
+const facebookOptions = {
+  clientID: process.env.FB_APP_ID,
+  clientSecret: process.env.FB_APP_SECRET,
+}
 
-const googleVerify = function (request, accessToken, refreshToken, profile, done) {
-    let email = profile.emails[0].value
-    // See if this user already exists
+const facebookVerify = (accessToken, refreshToken, profile, next) => {
+  try {
+    let email = profile.emails[0].value;
     let user = userService.findUserByEmail(email);
     if (!user) {
-      // They don't, so register them
       user = userService.createUser(email, profile.displayName, null);
     }
-    return done(null, user);
+    return next(null, user);
+  } catch (error) {
+    next(error, false);
   }
+};
+
 
 const jwtStrategy = new JwtStrategy(jwtOptions, jwtVerify);
-const googleStrategy = new passportGoogle.OAuth2Strategy(googleOptions, googleVerify)
-
+const facebookStrategy = new FacebookTokenStrategy(facebookOptions, facebookVerify)
 module.exports.jwtStrategy = jwtStrategy;
-module.exports.googleStrategy = googleStrategy;
+module.exports.facebookStrategy = facebookStrategy;
 

@@ -8,6 +8,9 @@ const { BadRequestError, UnauthorizedError } = require("../errors/errors");
 const UserService = require("../services/UserService");
 const auth = require("../middleware/auth");
 const passport = require('passport');
+require("dotenv").config();
+const { OAuth2Client } = require('google-auth-library')
+const client = new OAuth2Client(process.env.GOOGLE_APP_ID)
 const userService = new UserService();
 
 function generateAccessToken(userId, res) {
@@ -15,7 +18,7 @@ function generateAccessToken(userId, res) {
     {},
     config.get("jwtSecret"), {
       expiresIn: 360000,
-      subject: user_id.toString()
+      subject: userId.toString()
     },
     (err, token) => {
       if (err) {
@@ -70,15 +73,58 @@ router.post(
       if (!(await bcrypt.compare(password, user.password))) {
         throw new BadRequestError("Incorrect Password");
       }
-
-      generateAccessToken(user.user_Id, res)
+      console.log(user)
+      generateAccessToken(user.user_id, res)
     } catch (err) {
       next(err)
     }
   }
 );
 
-router.get('/login/google/start', passport.authenticate('google', { session: false, scope: ['openid', 'profile', 'email'] }));
-router.get('/login/google/redirect', passport.authenticate('google', { session: false }), generateUserToken);
+router.post("/login/google", async (req, res, next) => {
+  const { token } = req.body
+
+  try {
+    const ticket = await client.verifyIdToken({
+    idToken: token,
+    audience: process.env.GOOGLE_APP_ID
+    });
+    const { name, email } = ticket.getPayload();    // TODO: we can also include 'picture' in the future
+    let user = await userService.findUserByEmail(email);
+    if (!user) {
+      user = await userService.createUser(email, name, null);
+    }
+    generateAccessToken(user.user_id, res);
+  } catch (err) {
+    console.log(err)
+    next(err)
+  }
+});
+
+const facebookAuth = passport.authenticate("facebook-token", {
+  session: false,
+  failWithError: true,
+});
+
+const fbLogin = (req, res, next) => {
+  if (request.user) {
+    console.log("Successful login via Facebook.");
+    console.log(request.authInfo)
+    console.log("_____________________")
+    console.log(request.user.user_id)
+    generateAccessToken(request.user.user_id, res);
+  }
+};
+
+const fbLoginError = (err, req, res, next) => {
+  if (err) {
+    console.log("Error logging in via Facebook.");
+    res.status(401).json({
+      error: err,
+    });
+  }
+};
+
+router.post("/login/facebook",facebookAuth, fbLogin, fbLoginError);
 
 module.exports = router;

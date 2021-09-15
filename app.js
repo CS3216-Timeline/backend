@@ -3,7 +3,7 @@ const helmet = require("helmet");
 const cors = require("cors");
 const xss = require("xss-clean");
 const passport = require('passport');
-const { jwtStrategy, googleStrategy } = require('./config/passport');
+const { jwtStrategy, facebookStrategy } = require('./config/passport');
 const config = require('config');
 
 const routes = require("./routes/");
@@ -20,7 +20,7 @@ app.use(cors());
 // jwt authentication
 app.use(passport.initialize());
 passport.use('jwt', jwtStrategy);
-passport.use(googleStrategy);
+passport.use(facebookStrategy);
 
 
 app.use("/api", routes);
