@@ -31,13 +31,10 @@ function generateAccessToken(userId, res) {
   );
 }
 
-function generateUserToken(req, res) {
-  generateAccessToken(req.user.user_id, res);
-}
-
 router.get("/", passport.authenticate(['jwt'], { session: false }), async (req, res, next) => {
   try {
-    const user = await userService.findUserById(req.userId);
+    console.log(req.user.user_id)
+    const user = await userService.findUserById(req.user.user_id);
     res.json(user);
   } catch (err) {
     next(err);
@@ -53,16 +50,19 @@ router.post(
   ],
   async (req, res, next) => {
     const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      throw new BadRequestError(
-        errors
-          .array()
-          .map((err) => err.msg)
-          .join(", ")
-      );
-    }
-    const { email, password } = req.body;
+
     try {
+      if (!errors.isEmpty()) {
+        throw new BadRequestError(
+          errors
+            .array()
+            .map((err) => err.msg)
+            .join(", ")
+        );
+      }
+
+      const { email, password } = req.body;
+      
       // 1. Find out if user with such an email exist
       const user = await userService.findUserByEmail(email);
       if (!user) {
@@ -94,6 +94,7 @@ router.post("/login/google", async (req, res, next) => {
     if (!user) {
       user = await userService.createUser(email, name, null);
     }
+    console.log(user);
     generateAccessToken(user.user_id, res);
   } catch (err) {
     console.log(err)

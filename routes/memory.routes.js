@@ -25,7 +25,7 @@ router.post('/',
       throw new BadRequestError(errors.array().map(err => err.msg).join(', '))
     }
 
-    const userId = req.userId;
+    const userId = req.user.user_id;
     const { title } = req.body;
 
     try {
