@@ -11,17 +11,19 @@ const auth = (req, res, next) => {
 
   // check if not token
   if (!token) {
+    console.log("Request Error: No token")
     throw new UnauthorizedError('Unauthorized')
   }
 
   try {
     const {
-      user
+      sub
     } = jwt.verify(token, config.get("jwtSecret"));
-    // get the email of the user
-    req.userId = user.id;
+    // get the id of the user
+    req.user.user_id = sub;
     next();
   } catch (err) {
+    console.log("Request Error: Token is invalid")
     throw new UnauthorizedError('Unauthorized')
   }
 };

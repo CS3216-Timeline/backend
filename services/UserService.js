@@ -15,14 +15,22 @@ class UserService {
       if (user.rows[0]) {
         throw new BadRequestError('Email already used, please login')
       }
-      // hash the password 
-      const salt = await bcrypt.genSalt(10);
-      const hashedPassword = await bcrypt.hash(password, salt);
+      let newUser = null;
+      if (password != null) {
+        // hash the password 
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(password, salt);
 
-      const newUser = await pool.query(
-        "INSERT INTO users (email, name, password) VALUES($1, $2, $3) RETURNING *",
-        [email, name, hashedPassword]
-      );
+        newUser = await pool.query(
+          "INSERT INTO users (email, name, password) VALUES($1, $2, $3) RETURNING *",
+          [email, name, hashedPassword]
+        );
+      } else {
+        newUser = await pool.query(
+          "INSERT INTO users (email, name) VALUES($1, $2) RETURNING *",
+          [email, name]
+        );
+      }
       return newUser.rows[0];
     } catch (err) {
       throw err;
@@ -42,7 +50,7 @@ class UserService {
 
   async findUserById(userId) {
     try {
-      const user = await pool.query("SELECT email, name FROM users WHERE user_id = $1", [
+      const user = await pool.query("SELECT user_id, email, name FROM users WHERE user_id = $1", [
         userId
       ]);
       return user.rows[0];

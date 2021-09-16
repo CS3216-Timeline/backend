@@ -2,10 +2,12 @@ const express = require("express");
 const helmet = require("helmet");
 const cors = require("cors");
 const xss = require("xss-clean");
-// const passport = require('passport'); // TODO: Replace current bcrypt solution with passport
+const passport = require('passport');
+const { jwtStrategy, facebookStrategy } = require('./config/passport');
+const config = require('config');
 
 const routes = require("./routes/");
-const HTTPError = require("./errors/errors");
+const { HTTPError } = require("./errors/errors");
 
 const app = express();
 
@@ -14,18 +16,24 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(xss());
 app.use(cors());
+
+// jwt authentication
+app.use(passport.initialize());
+passport.use('jwt', jwtStrategy);
+passport.use(facebookStrategy);
+
+
 app.use("/api", routes);
 
-// TODO: This thing crashes if there's an error (can try replicating by changing DB name in .env)
-// app.use((err, req, res, next) => {
-//   if (err instanceof HTTPError) {
-//     res.status(err.status).json({
-//       error: err.message
-//     });
-//     return;
-//   }
-//   next(err);
-// });
+app.use((err, req, res, next) => {
+  if (err instanceof HTTPError) {
+    res.status(err.status).json({
+      error: err.message
+    });
+    return;
+  }
+  next(err);
+});
 
 app.use((err, req, res, next) => {
   res.status(500).json({
