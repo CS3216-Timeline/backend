@@ -5,6 +5,7 @@ const authRoutes = require("./auth.routes");
 const lineRoutes = require("./line.routes");
 const memoryRoutes = require("./memory.routes");
 const debugRoutes = require("./debug.routes");
+const mapboxRoutes = require("./mapbox.routes");
 
 const router = express.Router();
 
@@ -24,6 +25,10 @@ const routes = [
     {
         path: '/memories',
         route: memoryRoutes,
+    },
+    {
+        path: '/mapbox',
+        route: mapboxRoutes,
     },
     {
         path: '/debug',
