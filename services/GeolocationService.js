@@ -13,10 +13,8 @@ class GeolocationService {
       url.searchParams.append("worldview", "cn");
       url.searchParams.append("access_token", mapboxApiKey);
       url.searchParams.append("limit", 10);
-      // let url = `${STARTING_URL}${searchText}.json?worldview=cn&access_token=${mapboxApiKey}`;
       if (longitude && latitude) {
         url.searchParams.append("proximity", `${longitude},${latitude}`);
-        // url += `&proximity=${longitude},${latitude}`;
       }
       const res = await axios.get(url.href);
       const suggestionsFromSearch = res.data.features.map((location) => {

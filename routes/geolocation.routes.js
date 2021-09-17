@@ -1,9 +1,9 @@
 const express = require("express");
 const router = express.Router();
 const passport = require('passport');
-const MapboxService = require('../services/GeolocationService');
+const GeolocationService = require('../services/GeolocationService');
 
-const mapboxService = new MapboxService();
+const geolocationService = new GeolocationService();
 
 router.get("/locations", passport.authenticate(['jwt'], {
   session: false
@@ -14,7 +14,7 @@ router.get("/locations", passport.authenticate(['jwt'], {
     latitude
   } = req.query;
   try {
-    const suggestions = await mapboxService.getLocationSuggestions(searchText, longitude, latitude)
+    const suggestions = await geolocationService.getLocationSuggestions(searchText, longitude, latitude)
     res.status(200).json({
       suggestions
     })
@@ -31,7 +31,7 @@ router.get("/features", passport.authenticate(['jwt'], {
     latitude
   } = req.query;
   try {
-    const features = await mapboxService.getGeographicFeatures(longitude, latitude)
+    const features = await geolocationService.getGeographicFeatures(longitude, latitude)
     res.status(200).json({
       features
     })
