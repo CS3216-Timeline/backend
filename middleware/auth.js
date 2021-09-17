@@ -20,7 +20,7 @@ const auth = (req, res, next) => {
       sub
     } = jwt.verify(token, config.get("jwtSecret"));
     // get the id of the user
-    req.user.user_id = sub;
+    req.user.userId = sub;
     next();
   } catch (err) {
     console.log("Request Error: Token is invalid")

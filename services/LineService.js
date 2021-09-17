@@ -1,4 +1,6 @@
 const pool = require('../db/db');
+const camelizeKeys = require('../db/utils');
+const { snakeCase } = require('lodash');
 const {
   NotFoundError
 } = require('../errors/errors');
@@ -6,13 +8,13 @@ const {
 class LineService {
   constructor() { }
 
-  async createLine(userId, name, colourHex) {
+  async createLine(userId, name, colorHex) {
     try {
       const newLine = await pool.query(
-        "INSERT INTO lines (user_id, name, colour_hex) VALUES ($1, $2, $3) RETURNING *",
-        [userId, name, colourHex]
+        "INSERT INTO lines (user_id, name, color_hex, last_updated_date) VALUES ($1, $2, $3, NOW()) RETURNING *",
+        [userId, name, colorHex]
       );
-      return newLine.rows[0];
+      return camelizeKeys(newLine.rows[0]);
     } catch (err) {
       throw err;
     }
@@ -24,7 +26,10 @@ class LineService {
         "SELECT * FROM lines WHERE line_id = $1",
         [lineId]
       );
-      return lines.rows[0];
+      if (!lines.rows[0]) {
+        throw new NotFoundError('Line does not exist');
+      }
+      return camelizeKeys(lines.rows[0]);
     } catch (err) {
       throw err;
     }
@@ -36,33 +41,76 @@ class LineService {
         "SELECT * FROM lines WHERE user_id = $1",
         [userId]
       );
-      return lines.rows;
+      return camelizeKeys(lines.rows);
     } catch (err) {
       throw err;
     }
   }
 
-  async getAllLinesByUserIdOrderByMostRecentMemory(userId) {
+  async getLineByLineIdWithMemoriesOrderByCreationDate(lineId) {
+    try {
+      const lineWithMemories = await pool.query(
+        "SELECT * FROM lines L LEFT JOIN memories M ON L.line_id = M.line_id WHERE L.line_id = $1 ORDER BY M.creation_date DESC",
+        [lineId]
+      );
+      if (!linesWithMemories.rows[0]) {
+        throw new NotFoundError('Line does not exist');
+      }
+      return camelizeKeys(lineWithMemories.rows);
+    } catch (err) {
+      throw err;
+    }
+  }
+  
+  async getAllLinesByUserIdOrderByMostRecentChange(userId) {
     try {
       const lines = await pool.query(
-        "SELECT line_id, user_id, name, colour_hex, (SELECT MAX(creation_date) FROM memories WHERE line_id = L.line_id) AS last_memory_date FROM lines L WHERE user_id = $1 ORDER BY last_memory_date DESC",
+        "SELECT * FROM lines WHERE user_id = $1 ORDER BY last_updated_date DESC;",
         [userId]
       );
-      return lines.rows;
+      return camelizeKeys(lines.rows);
     } catch (err) {
       throw err;
     }
   }
 
-  async deleteLineById(lineId) {
+  async updateLineByLineId(lineId, userId, name, colorHex) {
+    const changeList = [];
+    const columns = { "name": name, "color_hex": colorHex }
+    for (var columnName in columns) {
+      if (columns[columnName] != undefined) {
+        changeList.push(columnName + " = '" + columns[columnName]+"'");
+      }
+    }
+
     try {
-      const deletedLine = await pool.query("DELETE FROM lines WHERE line_id = $1 RETURNING *", [
-        lineId
+      if (changeList.length == 0) {
+        throw BadRequestError("At least one change is required")
+      }
+      const changes = changeList.join(", ");
+      console.log(changes);
+
+      const updatedLine = await pool.query(`UPDATE lines SET ${changes} WHERE line_id = $1 AND user_id = $2 RETURNING *`, [
+        lineId, userId
+      ]);
+      if (!updatedLine.rows[0]) {
+        throw new NotFoundError('Line does not exist for the user, cannot update');
+      }
+      return camelizeKeys(updatedLine.rows[0]);
+    } catch (err) {
+      throw err;
+    }
+  }
+
+    async deleteLineByLineId(lineId, userId) {
+    try {
+      const deletedLine = await pool.query("DELETE FROM lines WHERE line_id = $1 AND user_id = $2 RETURNING *", [
+        lineId, userId
       ]);
       if (!deletedLine.rows[0]) {
-        throw NotFoundError('Line does not exist, cannot delete');
+        throw new NotFoundError('Line does not exist for the user, cannot delete');
       }
-      return deletedLine.rows[0];
+      return camelizeKeys(deletedLine.rows[0]);
     } catch (err) {
       throw err;
     }

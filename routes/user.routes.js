@@ -37,7 +37,7 @@ router.post(
 
       const payload = {
         user: {
-          id: user.user_id,
+          id: user.userId,
         },
       };
 
