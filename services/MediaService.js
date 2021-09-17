@@ -1,4 +1,5 @@
 const pool = require('../db/db');
+const camelizeKeys = require('../db/utils');
 const {
   NotFoundError
 } = require('../errors/errors');
@@ -6,13 +7,13 @@ const {
 class MediaService {
   constructor() { }
 
-  async createMedia(url, memoryId) {
+  async createMedia(url, memoryId, creationDate) {
     try {
       const newMedia = await pool.query(
-        "INSERT INTO media (url, memory_id) VALUES ($1, $2) RETURNING *",
-        [url, memoryId]
+        "INSERT INTO media (url, memory_id, creation_date) VALUES ($1, $2, $3) RETURNING *",
+        [url, memoryId, creationDate]
       );
-      return newMedia.rows[0];
+      return camelizeKeys(newMedia.rows[0]);
     } catch (err) {
       throw err;
     }
@@ -24,7 +25,7 @@ class MediaService {
         "SELECT * FROM media WHERE memory_id = $1",
         [memoryId]
       );
-      return media.rows;
+      return camelizeKeys(media.rows);
     } catch (err) {
       throw err;
     }
@@ -36,7 +37,7 @@ class MediaService {
         "SELECT * FROM media WHERE media_id = $1",
         [mediaId]
       );
-      return media.rows[0];
+      return camelizeKeys(media.rows[0]);
     } catch (err) {
       throw err;
     }
@@ -50,7 +51,7 @@ class MediaService {
       if (!deletedMedia.rows[0]) {
         throw NotFoundError('Media does not exist, cannot delete');
       }
-      return deletedMedia.rows[0];
+      return camelizeKeys(deletedMedia.rows[0]);
     } catch (err) {
       throw err;
     }

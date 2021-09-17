@@ -33,8 +33,8 @@ function generateAccessToken(userId, res) {
 
 router.get("/", passport.authenticate(['jwt'], { session: false }), async (req, res, next) => {
   try {
-    console.log(req.user.user_id)
-    const user = await userService.findUserById(req.user.user_id);
+    console.log(req.user.userId)
+    const user = await userService.findUserById(req.user.userId);
     res.json(user);
   } catch (err) {
     next(err);
@@ -74,7 +74,7 @@ router.post(
         throw new BadRequestError("Incorrect Password");
       }
       console.log(user)
-      generateAccessToken(user.user_id, res)
+      generateAccessToken(user.userId, res)
     } catch (err) {
       next(err)
     }
@@ -95,7 +95,7 @@ router.post("/login/google", async (req, res, next) => {
       user = await userService.createUser(email, name, null);
     }
     console.log(user);
-    generateAccessToken(user.user_id, res);
+    generateAccessToken(user.userId, res);
   } catch (err) {
     console.log(err)
     next(err)
@@ -112,9 +112,9 @@ const fbLogin = (req, res, next) => {
     console.log("Successful login via Facebook.");
     console.log(req.authInfo)
     console.log("_____________________")
-    console.log(req.user.user_id)
-    generateAccessToken(req.user.user_id, res);
-    // generateAccessToken(req.authInfo.user_id, res);
+    console.log(req.user.userId)
+    generateAccessToken(req.user.userId, res);
+    // generateAccessToken(req.authInfo.userId, res);
   }
 };
 

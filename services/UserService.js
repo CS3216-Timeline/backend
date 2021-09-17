@@ -1,5 +1,6 @@
 const bcrypt = require('bcryptjs');
 const pool = require('../db/db');
+const camelizeKeys = require('../db/utils');
 const {
   BadRequestError
 } = require('../errors/errors');
@@ -31,7 +32,7 @@ class UserService {
           [email, name]
         );
       }
-      return newUser.rows[0];
+      return camelizeKeys(newUser.rows[0]);
     } catch (err) {
       throw err;
     }
@@ -42,7 +43,7 @@ class UserService {
       const user = await pool.query("SELECT * FROM users WHERE email = $1", [
         email
       ]);
-      return user.rows[0];
+      return camelizeKeys(user.rows[0]);
     } catch (err) {
       throw err;
     }
@@ -53,7 +54,7 @@ class UserService {
       const user = await pool.query("SELECT user_id, email, name FROM users WHERE user_id = $1", [
         userId
       ]);
-      return user.rows[0];
+      return camelizeKeys(user.rows[0]);
     } catch (err) {
       throw err;
     }

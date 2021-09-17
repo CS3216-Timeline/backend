@@ -1,4 +1,5 @@
 const pool = require('../db/db');
+const camelizeKeys = require('../db/utils');
 const {
   NotFoundError
 } = require('../errors/errors');
@@ -12,7 +13,7 @@ class MemoryService {
         "INSERT INTO memories (line_id, title, description, creation_date, latitude, longitude) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *",
         [lineId, title, description, creationDate, latitude, longitude]
       );
-      return newMemory.rows[0];
+      return camelizeKeys(newMemory.rows[0]);
     } catch (err) {
       throw err;
     }
@@ -24,7 +25,7 @@ class MemoryService {
         "SELECT * FROM memories WHERE line_id = $1",
         [lineId]
       );
-      return memories.rows;
+      return camelizeKeys(memories.rows);
     } catch (err) {
       throw err;
     }
@@ -36,7 +37,7 @@ class MemoryService {
         "SELECT * FROM memories WHERE memory_id = $1",
         [memoryId]
       );
-      return memories.rows[0];
+      return camelizeKeys(memories.rows[0]);
     } catch (err) {
       throw err;
     }
@@ -50,7 +51,7 @@ class MemoryService {
       if (!deletedMemory.rows[0]) {
         throw NotFoundError('Memory does not exist, cannot delete');
       }
-      return deletedMemory.rows[0];
+      return camelizeKeys(deletedMemory.rows[0]);
     } catch (err) {
       throw err;
     }

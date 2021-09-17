@@ -13,7 +13,9 @@ CREATE TABLE lines(
     line_id SERIAL PRIMARY KEY,
     user_id SERIAL NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
     name VARCHAR NOT NULL,
-    colour_hex CHAR(6) NOT NULL CHECK (colour_hex ~* '^[a-f0-9]{6}$')
+    color_hex CHAR(6) NOT NULL CHECK (color_hex ~* '^[a-f0-9]{6}$'),
+    last_updated_date TIMESTAMP WITH TIME ZONE NOT NULL,
+    UNIQUE (user_id, name)
 );
 
 CREATE TABLE memories(
@@ -28,8 +30,45 @@ CREATE TABLE memories(
 );
 
 CREATE TABLE media(
-    id SERIAL PRIMARY KEY, 
+    media_id SERIAL PRIMARY KEY, 
     url VARCHAR UNIQUE NOT NULL,
     memory_id SERIAL NOT NULL REFERENCES memories(memory_id) ON DELETE CASCADE
+    -- creation_date TIMESTAMP WITH TIME ZONE NOT NULL
 );
 
+CREATE OR REPLACE FUNCTION refresh_updated_date() RETURNS TRIGGER
+AS $$
+BEGIN
+    IF (TG_TABLE_NAME = 'media') THEN
+        IF (TG_OP = 'DELETE') THEN
+            UPDATE lines SET last_updated_date = NOW() WHERE line_id = (SELECT line_id FROM memories WHERE memory_id = OLD.memory_id);
+        ELSE
+            UPDATE lines SET last_updated_date = NOW() WHERE line_id = (SELECT line_id FROM memories WHERE memory_id = NEW.memory_id);
+    END IF;
+    ELSE
+        IF (TG_OP = 'DELETE') THEN
+            UPDATE lines SET last_updated_date = NOW() WHERE line_id = OLD.line_id;
+        ELSE
+            UPDATE lines SET last_updated_date = NOW() WHERE line_id = NEW.line_id;
+        END IF;
+    END IF;
+    RETURN NULL;
+END;
+$$ LANGUAGE plpgsql;
+
+
+CREATE TRIGGER update_line_media 
+AFTER INSERT OR UPDATE OR DELETE ON media 
+FOR EACH ROW 
+EXECUTE FUNCTION refresh_updated_date();
+
+CREATE TRIGGER update_line_memories 
+AFTER INSERT OR UPDATE OR DELETE ON memories 
+FOR EACH ROW 
+EXECUTE FUNCTION refresh_updated_date();
+
+CREATE TRIGGER update_line_details 
+AFTER UPDATE ON lines
+FOR EACH ROW
+WHEN (OLD.* IS DISTINCT FROM NEW.*) AND (OLD.last_updated_date = NEW.last_updated_date)
+EXECUTE PROCEDURE refresh_updated_date();
