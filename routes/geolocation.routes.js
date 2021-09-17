@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const passport = require('passport');
-const MapboxService = require('../services/MapboxService');
+const MapboxService = require('../services/GeolocationService');
 
 const mapboxService = new MapboxService();
 

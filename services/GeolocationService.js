@@ -4,13 +4,21 @@ const mapboxApiKey = process.env.MAPBOX_APP_SECRET
 
 const STARTING_URL = "https://api.mapbox.com/geocoding/v5/mapbox.places/";
 
-class MapboxService {
-  constructor() { }
+class GeolocationService {
+  constructor() {}
 
   async getLocationSuggestions(searchText, longitude, latitude) {
     try {
-      const url = `${STARTING_URL}${searchText}.json?worldview=cn&limit=10&access_token=${mapboxApiKey}&proximity=${longitude},${latitude}`;
-      const res = await axios.get(url);
+      let url = new URL(`${STARTING_URL}${searchText}.json`);
+      url.searchParams.append("worldview", "cn");
+      url.searchParams.append("access_token", mapboxApiKey);
+      url.searchParams.append("limit", 10);
+      // let url = `${STARTING_URL}${searchText}.json?worldview=cn&access_token=${mapboxApiKey}`;
+      if (longitude && latitude) {
+        url.searchParams.append("proximity", `${longitude},${latitude}`);
+        // url += `&proximity=${longitude},${latitude}`;
+      }
+      const res = await axios.get(url.href);
       const suggestionsFromSearch = res.data.features.map((location) => {
         return {
           place_name: location.place_name,
@@ -25,7 +33,10 @@ class MapboxService {
 
   async getGeographicFeatures(longitude, latitude) {
     try {
-      const res = await axios.get(`${STARTING_URL}${longitude},${latitude}.json?worldview=cn&access_token=${mapboxApiKey}`);
+      let url = new URL(`${STARTING_URL}${longitude},${latitude}.json`);
+      url.searchParams.append("worldview", "cn");
+      url.searchParams.append("access_token", mapboxApiKey);
+      const res = await axios.get(url.href);
       const features = res.data.features.map((location) => {
         return {
           place_name: location.place_name,
@@ -39,4 +50,4 @@ class MapboxService {
   }
 }
 
-module.exports = MapboxService
+module.exports = GeolocationService
