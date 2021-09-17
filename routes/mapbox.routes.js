@@ -12,7 +12,7 @@ router.get("/locations", passport.authenticate(['jwt'], {
     searchText,
     longitude,
     latitude
-  } = req.body;
+  } = req.query;
   try {
     const suggestions = await mapboxService.getLocationSuggestions(searchText, longitude, latitude)
     res.status(200).json({
@@ -29,7 +29,7 @@ router.get("/features", passport.authenticate(['jwt'], {
   const {
     longitude,
     latitude
-  } = req.body;
+  } = req.query;
   try {
     const features = await mapboxService.getGeographicFeatures(longitude, latitude)
     res.status(200).json({
