@@ -12,6 +12,7 @@ require("dotenv").config();
 const { OAuth2Client } = require('google-auth-library')
 const client = new OAuth2Client(process.env.GOOGLE_APP_ID)
 const userService = new UserService();
+const minPasswordLength = 5;
 
 function generateAccessToken(userId, res) {
   jwt.sign(
@@ -40,6 +41,40 @@ router.get("/", passport.authenticate(['jwt'], { session: false }), async (req, 
     next(err);
   }
 });
+
+router.post(
+  "/register",
+  [
+    check("email", "Please fill in a valid email").isEmail(),
+    check("name", "Please fill in your name").not().isEmpty().isString(),
+    check(
+      "password",
+      "Please enter a password with " + minPasswordLength + " or more characters"
+    ).isLength({
+      min: minPasswordLength
+    }),
+  ],
+  async (req, res, next) => {
+    const errors = validationResult(req)
+    try {
+      if (!errors.isEmpty()) {
+        throw new BadRequestError(errors.array().map(err => err.msg).join(', '))
+      }
+
+      const {
+        email,
+        name,
+        password
+      } = req.body;
+
+      const user = await userService.createUser(email, name, password)
+      generateAccessToken(user.userId, res)
+
+    } catch (err) {
+      next(err)
+    }
+  }
+)
 
 // login route
 router.post(

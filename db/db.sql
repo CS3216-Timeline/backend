@@ -71,5 +71,5 @@ EXECUTE PROCEDURE refresh_updated_date();
 CREATE TRIGGER update_line_details 
 AFTER UPDATE ON lines
 FOR EACH ROW
-WHEN (OLD.* IS DISTINCT FROM NEW.*) AND (OLD.last_updated_date = NEW.last_updated_date)
+WHEN ((OLD.* IS DISTINCT FROM NEW.*) AND (OLD.last_updated_date = NEW.last_updated_date))
 EXECUTE PROCEDURE refresh_updated_date();
