@@ -105,8 +105,9 @@ router.patch(
 );
 
 router.delete("/:lineId", passport.authenticate(['jwt'], { session: false }), async (req, res, next) => {
-  const lineId = req.params.lineId;
   try {
+    const userId = req.user.userId;
+    const lineId = req.params.lineId;
     const line = await lineService.deleteLineByLineId(lineId, userId);
 
     res.status(200).json({
