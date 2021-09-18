@@ -7,11 +7,11 @@ const {
 class MediaService {
   constructor() { }
 
-  async createMedia(url, memoryId, creationDate) {
+  async createMedia(url, memoryId, position) {
     try {
       const newMedia = await pool.query(
-        "INSERT INTO media (url, memory_id, creation_date) VALUES ($1, $2, $3) RETURNING *",
-        [url, memoryId, creationDate]
+        "INSERT INTO media (url, memory_id, position) VALUES ($1, $2, $3) RETURNING *",
+        [url, memoryId, position]
       );
       return camelizeKeys(newMedia.rows[0]);
     } catch (err) {

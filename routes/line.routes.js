@@ -60,9 +60,38 @@ router.post(
 
 router.get("/:lineId", passport.authenticate(['jwt'], { session: false }), async (req, res, next) => {
   const lineId = req.params.lineId;
+
   try {
-    const line = await lineService.getLineByLineId(lineId);
-    if (line["userId"] == req.user.userId) {
+    let line = {};
+    if (req.query.includeMemories == "true") {
+      let lineWithMemories = await lineService.getLineByLineIdWithMemoriesOrderByCreationDate(lineId)
+      line.lineId = lineWithMemories[0].lineId
+      line.userId = lineWithMemories[0].userId
+      line.name = lineWithMemories[0].name
+      line.colorHex = lineWithMemories[0].colorHex
+      line.lastUpdatedDate = lineWithMemories[0].lastUpdatedDate
+      line.memories = []
+      for (let memory of lineWithMemories) {
+        if (memory.memoryId = "null") {
+          console.log("No memories");
+          break;
+        }
+        line.memories.push({
+          "memoryId": memory.memoryId,
+          "lineId": memory.lineId,
+          "title": memory.title,
+          "description": memory.description,
+          "creationDate": memory.creationDate,
+          "latitude": memory.latitude,
+          "longitude": memory.longitude,
+          "thumbnailUrl": memory.thumbnailUrl
+        })
+      }
+    } else {
+      line = await lineService.getLineByLineId(lineId);
+    }
+    
+    if (line.userId == req.user.userId) {
       res.status(200).json({
         line,
       });
