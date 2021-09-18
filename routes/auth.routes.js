@@ -69,6 +69,10 @@ router.post(
         throw new BadRequestError(`No user found with email ${email}`);
       }
 
+      if (!user.password) {
+        throw new BadRequestError('Your account was created through social login.')
+      }
+
       // 2. Find out if the password is correct
       if (!(await bcrypt.compare(password, user.password))) {
         throw new BadRequestError("Incorrect Password");
@@ -85,6 +89,9 @@ router.post("/login/google", async (req, res, next) => {
   const { token } = req.body
 
   try {
+    if (!token) {
+      throw new BadRequestError("Missing token");
+    }
     const ticket = await client.verifyIdToken({
     idToken: token,
     audience: process.env.GOOGLE_APP_ID

@@ -32,8 +32,9 @@ CREATE TABLE memories(
 CREATE TABLE media(
     media_id SERIAL PRIMARY KEY, 
     url VARCHAR UNIQUE NOT NULL,
-    memory_id SERIAL NOT NULL REFERENCES memories(memory_id) ON DELETE CASCADE
-    -- creation_date TIMESTAMP WITH TIME ZONE NOT NULL
+    memory_id SERIAL NOT NULL REFERENCES memories(memory_id) ON DELETE CASCADE,
+    position INT NOT NULL,
+    UNIQUE (memory_id, position)
 );
 
 CREATE OR REPLACE FUNCTION refresh_updated_date() RETURNS TRIGGER
@@ -60,12 +61,12 @@ $$ LANGUAGE plpgsql;
 CREATE TRIGGER update_line_media 
 AFTER INSERT OR UPDATE OR DELETE ON media 
 FOR EACH ROW 
-EXECUTE FUNCTION refresh_updated_date();
+EXECUTE PROCEDURE refresh_updated_date();
 
 CREATE TRIGGER update_line_memories 
 AFTER INSERT OR UPDATE OR DELETE ON memories 
 FOR EACH ROW 
-EXECUTE FUNCTION refresh_updated_date();
+EXECUTE PROCEDURE refresh_updated_date();
 
 CREATE TRIGGER update_line_details 
 AFTER UPDATE ON lines

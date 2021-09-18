@@ -50,10 +50,15 @@ class LineService {
   async getLineByLineIdWithMemoriesOrderByCreationDate(lineId) {
     try {
       const lineWithMemories = await pool.query(
-        "SELECT * FROM lines L LEFT JOIN memories M ON L.line_id = M.line_id WHERE L.line_id = $1 ORDER BY M.creation_date DESC",
+        `SELECT L.line_id, L.user_id, L.name, L.color_hex, L.last_updated_date, 
+        M.memory_id, M.title, M.description, M.creation_date, M.latitude, M.longitude, (
+          SELECT url FROM media WHERE memory_id = M.memory_id ORDER BY position LIMIT 1
+        ) as thumbnail_url
+        FROM lines L LEFT JOIN memories M ON L.line_id = M.line_id
+        WHERE L.line_id = $1 ORDER BY M.creation_date DESC`,
         [lineId]
       );
-      if (!linesWithMemories.rows[0]) {
+      if (!lineWithMemories.rows[0]) {
         throw new NotFoundError('Line does not exist');
       }
       return camelizeKeys(lineWithMemories.rows);
@@ -78,7 +83,7 @@ class LineService {
     const changeList = [];
     const columns = { "name": name, "color_hex": colorHex }
     for (var columnName in columns) {
-      if (columns[columnName] != undefined) {
+      if (columns[columnName]) {
         changeList.push(columnName + " = '" + columns[columnName]+"'");
       }
     }
