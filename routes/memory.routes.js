@@ -3,13 +3,12 @@ const router = express.Router();
 const { check, validationResult } = require("express-validator");
 const { BadRequestError } = require("../errors/errors");
 const auth = require("../middleware/auth");
-const passport = require('passport');
 const MemoryService = require("../services/MemoryService");
 const memoryService = new MemoryService();
 
 // Create a memory
 router.post('/',
-  passport.authenticate(['jwt'], { session: false }),
+  auth,
   [
     //TODO: Check which fields are necessary 
     check("title", "Title of memory cannot be blank").notEmpty(),
@@ -25,7 +24,7 @@ router.post('/',
       throw new BadRequestError(errors.array().map(err => err.msg).join(', '))
     }
 
-    const userId = req.user.userId;
+    const { userId } = req.user;
     const { title } = req.body;
 
     try {
@@ -40,7 +39,7 @@ router.post('/',
 );
 
 // TODO: Verify if correct user.
-router.get("/:memoryId", passport.authenticate(['jwt'], { session: false }), async (req, res, next) => {
+router.get("/:memoryId", auth, async (req, res, next) => {
   const memoryId = req.params.memoryId;
   try {
     const memories = await memoryService.getMemoryByMemoryId(memoryId);
@@ -52,7 +51,7 @@ router.get("/:memoryId", passport.authenticate(['jwt'], { session: false }), asy
   }
 });
 
-router.delete("/:memoryId", passport.authenticate(['jwt'], { session: false }), async (req, res, next) => {
+router.delete("/:memoryId", auth, async (req, res, next) => {
   const memoryId = req.params.memoryId;
   try {
     const deletedMemory = await memoryService.deleteOneById(memoryId);

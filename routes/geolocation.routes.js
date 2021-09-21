@@ -1,13 +1,11 @@
 const express = require("express");
 const router = express.Router();
-const passport = require('passport');
 const GeolocationService = require('../services/GeolocationService');
+const auth = require("../middleware/auth");
 
 const geolocationService = new GeolocationService();
 
-router.get("/locations", passport.authenticate(['jwt'], {
-  session: false
-}), async (req, res, next) => {
+router.get("/locations", auth, async (req, res, next) => {
   const {
     searchText,
     longitude,
@@ -23,9 +21,7 @@ router.get("/locations", passport.authenticate(['jwt'], {
   }
 });
 
-router.get("/features", passport.authenticate(['jwt'], {
-  session: false
-}), async (req, res, next) => {
+router.get("/features", auth, async (req, res, next) => {
   const {
     longitude,
     latitude

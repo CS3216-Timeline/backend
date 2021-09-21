@@ -50,8 +50,7 @@ class LineService {
   async getLineByLineIdWithMemoriesOrderByCreationDate(lineId) {
     try {
       const lineWithMemories = await pool.query(
-        `SELECT L.line_id, L.user_id, L.name, L.color_hex, L.last_updated_date, 
-        M.memory_id, M.title, M.description, M.creation_date, M.latitude, M.longitude, (
+        `SELECT L.*, M.memory_id, M.title, M.description, M.creation_date, M.latitude, M.longitude, (
           SELECT url FROM media WHERE memory_id = M.memory_id ORDER BY position LIMIT 1
         ) as thumbnail_url
         FROM lines L LEFT JOIN memories M ON L.line_id = M.line_id
@@ -67,10 +66,19 @@ class LineService {
     }
   }
   
-  async getAllLinesByUserIdOrderByMostRecentChange(userId) {
+  async getAllLinesByUserIdWithLatestMemoryOrderByMostRecentChange(userId) {
     try {
       const lines = await pool.query(
-        "SELECT * FROM lines WHERE user_id = $1 ORDER BY last_updated_date DESC;",
+        `SELECT L.*, M.memory_id, M.title AS memory_title, M.description AS memory_description,
+        M.creation_date AS memory_creation_date, M.latitude AS memory_latitude, M.longitude AS memory_longitude, (
+          SELECT url FROM media WHERE memory_id = M.memory_id ORDER BY position LIMIT 1
+        ) AS thumbnail_url
+        FROM lines L LEFT JOIN memories M ON L.line_id = M.line_id
+        WHERE L.user_id = $1 AND (
+          M.creation_date IS NULL OR M.creation_date = (
+            SELECT MAX(creation_date) FROM memories WHERE line_id = M.line_id
+          )
+        ) ORDER BY L.last_updated_date DESC`,
         [userId]
       );
       return camelizeKeys(lines.rows);
@@ -80,23 +88,9 @@ class LineService {
   }
 
   async updateLineByLineId(lineId, userId, name, colorHex) {
-    const changeList = [];
-    const columns = { "name": name, "color_hex": colorHex }
-    for (var columnName in columns) {
-      if (columns[columnName]) {
-        changeList.push(columnName + " = '" + columns[columnName]+"'");
-      }
-    }
-
     try {
-      if (changeList.length == 0) {
-        throw BadRequestError("At least one change is required")
-      }
-      const changes = changeList.join(", ");
-      console.log(changes);
-
-      const updatedLine = await pool.query(`UPDATE lines SET ${changes} WHERE line_id = $1 AND user_id = $2 RETURNING *`, [
-        lineId, userId
+      const updatedLine = await pool.query(`UPDATE lines SET name = COALESCE($1, name), color_hex = COALESCE($2, color_hex) WHERE line_id = $3 AND user_id = $4 RETURNING *`, [
+        name, colorHex, lineId, userId
       ]);
       if (!updatedLine.rows[0]) {
         throw new NotFoundError('Line does not exist for the user, cannot update');
@@ -107,7 +101,7 @@ class LineService {
     }
   }
 
-    async deleteLineByLineId(lineId, userId) {
+  async deleteLineByLineId(lineId, userId) {
     try {
       const deletedLine = await pool.query("DELETE FROM lines WHERE line_id = $1 AND user_id = $2 RETURNING *", [
         lineId, userId

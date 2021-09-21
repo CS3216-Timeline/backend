@@ -36,7 +36,7 @@ const facebookVerify = (accessToken, refreshToken, profile, next) => {
     let email = profile.emails[0].value;
     let user = userService.findUserByEmail(email);
     if (!user) {
-      user = userService.createUser(email, profile.displayName, null);
+      user = userService.createUser(email, profile.displayName, null, profile.photos[0].value);
     }
     return next(null, user);
   } catch (error) {

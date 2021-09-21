@@ -32,7 +32,7 @@ function generateAccessToken(userId, res) {
   );
 }
 
-router.get("/", passport.authenticate(['jwt'], { session: false }), async (req, res, next) => {
+router.get("/", auth, async (req, res, next) => {
   try {
     console.log(req.user.userId)
     const user = await userService.findUserById(req.user.userId);
@@ -67,7 +67,7 @@ router.post(
         password
       } = req.body;
 
-      const user = await userService.createUser(email, name, password)
+      const user = await userService.createUser(email, name, password, null) // TODO: upload picture and get url
       generateAccessToken(user.userId, res)
 
     } catch (err) {
@@ -81,7 +81,7 @@ router.post(
   "/login",
   [
     check("email", "Please include a valid email").isEmail(),
-    check("password", "Please is required").exists(),
+    check("password", "Password is required").exists(),
   ],
   async (req, res, next) => {
     const errors = validationResult(req);
@@ -131,10 +131,10 @@ router.post("/login/google", async (req, res, next) => {
     idToken: token,
     audience: process.env.GOOGLE_APP_ID
     });
-    const { name, email } = ticket.getPayload();    // TODO: we can also include 'picture' in the future
+    const { name, email, picture } = ticket.getPayload();
     let user = await userService.findUserByEmail(email);
     if (!user) {
-      user = await userService.createUser(email, name, null);
+      user = await userService.createUser(email, name, null, null); // TODO: upload picture and get url 
     }
     console.log(user);
     generateAccessToken(user.userId, res);
