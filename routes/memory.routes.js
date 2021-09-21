@@ -67,6 +67,10 @@ router.get(
       const { userId } = req.user;
       const { memoryId } = req.params;
 
+      if (!(await checkIfMemoryExists(memoryId))) {
+        throw new BadRequestError("Memory does not exist");
+      }
+
       if (!(await checkIfUserIsMemoryOwner(userId, memoryId))) {
         throw new UnauthorizedError("Memory does not belong to this user");
       }
@@ -88,6 +92,10 @@ router.delete(
     try {
       const { userId } = req.user;
       const { memoryId } = req.params;
+
+      if (!(await checkIfMemoryExists(memoryId))) {
+        throw new BadRequestError("Memory does not exist");
+      }
 
       if (!(await checkIfUserIsMemoryOwner(userId, memoryId))) {
         throw new UnauthorizedError("Memory does not belong to this user");
@@ -134,6 +142,10 @@ router.patch(
       const { memoryId } = req.params;
       const { title, lineId, description, creationDate, latitude, longitude } = req.body;
 
+      if (!(await checkIfMemoryExists(memoryId))) {
+        throw new BadRequestError("Memory does not exist");
+      }
+
       if (!(await checkIfUserIsMemoryOwner(userId, memoryId))) {
         throw new UnauthorizedError("Memory does not belong to this user");
       }
@@ -156,6 +168,11 @@ router.patch(
     }
   }
 );
+
+async function checkIfMemoryExists(memoryId) {
+  const memory = await memoryService.getMemoryByMemoryId(memoryId);
+  return memory !== undefined;
+}
 
 async function checkIfUserIsLineOwner(userId, lineId) {
   const line = await lineService.getLineByLineId(lineId);
