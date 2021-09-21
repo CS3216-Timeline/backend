@@ -7,26 +7,28 @@ const bcrypt = require("bcryptjs");
 const { BadRequestError, UnauthorizedError } = require("../errors/errors");
 const UserService = require("../services/UserService");
 const auth = require("../middleware/auth");
-const passport = require('passport');
+const passport = require("passport");
 require("dotenv").config();
-const { OAuth2Client } = require('google-auth-library')
-const client = new OAuth2Client(process.env.GOOGLE_APP_ID)
+const { OAuth2Client } = require("google-auth-library");
+const client = new OAuth2Client(process.env.GOOGLE_APP_ID);
 const userService = new UserService();
 const minPasswordLength = 5;
+const { getAuth, signInWithCustomToken } = require("firebase/auth");
 
 function generateAccessToken(userId, res) {
   jwt.sign(
     {},
-    config.get("jwtSecret"), {
+    config.get("jwtSecret"),
+    {
       expiresIn: 360000,
-      subject: userId.toString()
+      subject: userId.toString(),
     },
     (err, token) => {
       if (err) {
-        throw new UnauthorizedError('user unauthorized');
+        throw new UnauthorizedError("user unauthorized");
       }
       res.json({
-        token
+        token,
       });
     }
   );
@@ -49,16 +51,23 @@ router.post(
     check("name", "Please fill in your name").not().isEmpty().isString(),
     check(
       "password",
-      "Please enter a password with " + minPasswordLength + " or more characters"
+      "Please enter a password with " +
+        minPasswordLength +
+        " or more characters"
     ).isLength({
-      min: minPasswordLength
+      min: minPasswordLength,
     }),
   ],
   async (req, res, next) => {
-    const errors = validationResult(req)
+    const errors = validationResult(req);
     try {
       if (!errors.isEmpty()) {
-        throw new BadRequestError(errors.array().map(err => err.msg).join(', '))
+        throw new BadRequestError(
+          errors
+            .array()
+            .map((err) => err.msg)
+            .join(", ")
+        );
       }
 
       const {
@@ -69,12 +78,11 @@ router.post(
 
       const user = await userService.createUser(email, name, password, null) // TODO: upload picture and get url
       generateAccessToken(user.userId, res)
-
     } catch (err) {
-      next(err)
+      next(err);
     }
   }
-)
+);
 
 // login route
 router.post(
@@ -97,7 +105,7 @@ router.post(
       }
 
       const { email, password } = req.body;
-      
+
       // 1. Find out if user with such an email exist
       const user = await userService.findUserByEmail(email);
       if (!user) {
@@ -105,31 +113,33 @@ router.post(
       }
 
       if (!user.password) {
-        throw new BadRequestError('Your account was created through social login.')
+        throw new BadRequestError(
+          "Your account was created through social login."
+        );
       }
 
       // 2. Find out if the password is correct
       if (!(await bcrypt.compare(password, user.password))) {
         throw new BadRequestError("Incorrect Password");
       }
-      console.log(user)
-      generateAccessToken(user.userId, res)
+      console.log(user);
+      generateAccessToken(user.userId, res);
     } catch (err) {
-      next(err)
+      next(err);
     }
   }
 );
 
 router.post("/login/google", async (req, res, next) => {
-  const { token } = req.body
+  const { token } = req.body;
 
   try {
     if (!token) {
       throw new BadRequestError("Missing token");
     }
     const ticket = await client.verifyIdToken({
-    idToken: token,
-    audience: process.env.GOOGLE_APP_ID
+      idToken: token,
+      audience: process.env.GOOGLE_APP_ID,
     });
     const { name, email, picture } = ticket.getPayload();
     let user = await userService.findUserByEmail(email);
@@ -139,8 +149,8 @@ router.post("/login/google", async (req, res, next) => {
     console.log(user);
     generateAccessToken(user.userId, res);
   } catch (err) {
-    console.log(err)
-    next(err)
+    console.log(err);
+    next(err);
   }
 });
 
@@ -152,9 +162,9 @@ const facebookAuth = passport.authenticate("facebook-token", {
 const fbLogin = (req, res, next) => {
   if (req.user) {
     console.log("Successful login via Facebook.");
-    console.log(req.authInfo)
-    console.log("_____________________")
-    console.log(req.user.userId)
+    console.log(req.authInfo);
+    console.log("_____________________");
+    console.log(req.user.userId);
     generateAccessToken(req.user.userId, res);
     // generateAccessToken(req.authInfo.userId, res);
   }
@@ -169,6 +179,6 @@ const fbLoginError = (err, req, res, next) => {
   }
 };
 
-router.post("/login/facebook",facebookAuth, fbLogin, fbLoginError);
+router.post("/login/facebook", facebookAuth, fbLogin, fbLoginError);
 
 module.exports = router;
