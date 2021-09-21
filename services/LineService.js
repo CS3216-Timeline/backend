@@ -1,12 +1,10 @@
-const pool = require('../db/db');
-const camelizeKeys = require('../db/utils');
-const { snakeCase } = require('lodash');
-const {
-  NotFoundError
-} = require('../errors/errors');
+const pool = require("../db/db");
+const camelizeKeys = require("../db/utils");
+const { snakeCase } = require("lodash");
+const { NotFoundError } = require("../errors/errors");
 
 class LineService {
-  constructor() { }
+  constructor() {}
 
   async createLine(userId, name, colorHex) {
     try {
@@ -22,12 +20,11 @@ class LineService {
 
   async getLineByLineId(lineId) {
     try {
-      const lines = await pool.query(
-        "SELECT * FROM lines WHERE line_id = $1",
-        [lineId]
-      );
+      const lines = await pool.query("SELECT * FROM lines WHERE line_id = $1", [
+        lineId,
+      ]);
       if (!lines.rows[0]) {
-        throw new NotFoundError('Line does not exist');
+        throw new NotFoundError("Line does not exist");
       }
       return camelizeKeys(lines.rows[0]);
     } catch (err) {
@@ -37,10 +34,9 @@ class LineService {
 
   async getAllLinesByUserId(userId) {
     try {
-      const lines = await pool.query(
-        "SELECT * FROM lines WHERE user_id = $1",
-        [userId]
-      );
+      const lines = await pool.query("SELECT * FROM lines WHERE user_id = $1", [
+        userId,
+      ]);
       return camelizeKeys(lines.rows);
     } catch (err) {
       throw err;
@@ -58,14 +54,14 @@ class LineService {
         [lineId]
       );
       if (!lineWithMemories.rows[0]) {
-        throw new NotFoundError('Line does not exist');
+        throw new NotFoundError("Line does not exist");
       }
       return camelizeKeys(lineWithMemories.rows);
     } catch (err) {
       throw err;
     }
   }
-  
+
   async getAllLinesByUserIdWithLatestMemoryOrderByMostRecentChange(userId) {
     try {
       const lines = await pool.query(
@@ -89,11 +85,15 @@ class LineService {
 
   async updateLineByLineId(lineId, userId, name, colorHex) {
     try {
-      const updatedLine = await pool.query(`UPDATE lines SET name = COALESCE($1, name), color_hex = COALESCE($2, color_hex) WHERE line_id = $3 AND user_id = $4 RETURNING *`, [
-        name, colorHex, lineId, userId
-      ]);
+      const updatedLine = await pool.query(
+        `UPDATE lines SET name = COALESCE($1, name), color_hex = COALESCE($2, color_hex) 
+        WHERE line_id = $3 AND user_id = $4 RETURNING *`,
+        [name, colorHex, lineId, userId]
+      );
       if (!updatedLine.rows[0]) {
-        throw new NotFoundError('Line does not exist for the user, cannot update');
+        throw new NotFoundError(
+          "Line does not exist for the user, cannot update"
+        );
       }
       return camelizeKeys(updatedLine.rows[0]);
     } catch (err) {
@@ -103,11 +103,14 @@ class LineService {
 
   async deleteLineByLineId(lineId, userId) {
     try {
-      const deletedLine = await pool.query("DELETE FROM lines WHERE line_id = $1 AND user_id = $2 RETURNING *", [
-        lineId, userId
-      ]);
+      const deletedLine = await pool.query(
+        "DELETE FROM lines WHERE line_id = $1 AND user_id = $2 RETURNING *",
+        [lineId, userId]
+      );
       if (!deletedLine.rows[0]) {
-        throw new NotFoundError('Line does not exist for the user, cannot delete');
+        throw new NotFoundError(
+          "Line does not exist for the user, cannot delete"
+        );
       }
       return camelizeKeys(deletedLine.rows[0]);
     } catch (err) {
@@ -116,4 +119,4 @@ class LineService {
   }
 }
 
-module.exports = LineService
+module.exports = LineService;

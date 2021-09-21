@@ -36,7 +36,7 @@ function generateAccessToken(userId, res) {
 
 router.get("/", auth, async (req, res, next) => {
   try {
-    console.log(req.user.userId)
+    console.log(req.user.userId);
     const user = await userService.findUserById(req.user.userId);
     res.json(user);
   } catch (err) {
@@ -70,14 +70,10 @@ router.post(
         );
       }
 
-      const {
-        email,
-        name,
-        password
-      } = req.body;
+      const { email, name, password } = req.body;
 
-      const user = await userService.createUser(email, name, password, null) // TODO: upload picture and get url
-      generateAccessToken(user.userId, res)
+      const user = await userService.createUser(email, name, password, null); // TODO: upload picture and get url
+      generateAccessToken(user.userId, res);
     } catch (err) {
       next(err);
     }
@@ -144,7 +140,7 @@ router.post("/login/google", async (req, res, next) => {
     const { name, email, picture } = ticket.getPayload();
     let user = await userService.findUserByEmail(email);
     if (!user) {
-      user = await userService.createUser(email, name, null, null); // TODO: upload picture and get url 
+      user = await userService.createUser(email, name, null, null); // TODO: upload picture and get url
     }
     console.log(user);
     generateAccessToken(user.userId, res);
