@@ -40,10 +40,16 @@ async function checkIfUserIsLineOwner(userId, lineId) {
   return line["userId"] === userId;
 }
 
+function isValidDate(year, month, day) {
+  date = new Date(`${year}/${month}/${day}`);
+  return date instanceof Date && !isNaN(date);
+}
+
 module.exports = {
   checkIfMemoryExists,
   checkIfMediaExists,
   checkIfUserIsMediaOwner,
   checkIfUserIsMemoryOwner,
   checkIfUserIsLineOwner,
+  isValidDate,
 };
