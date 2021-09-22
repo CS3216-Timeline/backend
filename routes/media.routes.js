@@ -1,0 +1,152 @@
+const express = require("express");
+const router = express.Router();
+const { check, oneOf, validationResult } = require("express-validator");
+const { BadRequestError, UnauthorizedError } = require("../errors/errors");
+const auth = require("../middleware/auth");
+const MemoryService = require("../services/MemoryService");
+const memoryService = new MemoryService();
+
+const multer = require("multer");
+const {
+  checkIfMemoryExists,
+  checkIfMediaExists,
+  checkIfUserIsMediaOwner,
+  checkIfUserIsMemoryOwner,
+} = require("../services/util");
+const StorageService = require("../services/StorageService");
+const storageService = new StorageService();
+const MediaService = require("../services/MediaService");
+const mediaService = new MediaService();
+const upload = multer();
+
+router.post(
+  "/",
+  auth,
+  upload.array("images", 10),
+  [check("memoryId", "Memory Id cannot be blank").notEmpty()],
+  async (req, res, next) => {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        throw new BadRequestError(
+          errors
+            .array()
+            .map((err) => err.msg)
+            .join(", ")
+        );
+      }
+
+      const { userId } = req.user;
+      const { memoryId } = req.body;
+
+      if (!(await checkIfUserIsMemoryOwner(userId, memoryId))) {
+        throw new UnauthorizedError("Memory does not belong to this user");
+      }
+
+      let curMedia = await mediaService.getAllMediaByMemory(memoryId);
+      const images = req.files;
+      for (let i = 0; i < images.length; i++) {
+        const url = await storageService.uploadImage(images[i]);
+        const newMedia = mediaService.createMedia(
+          url,
+          memoryId,
+          images.length + i
+        );
+        curMedia.push(newMedia);
+      }
+
+      res.status(200).json({
+        media,
+      });
+    } catch (err) {
+      next(err);
+    }
+  }
+);
+
+router.get("/:mediaId", auth, async (req, res, next) => {
+  try {
+    const { userId } = req.user;
+    const { mediaId } = req.params;
+
+    if (!(await checkIfMediaExists(mediaId))) {
+      throw new BadRequestError("Media does not exist");
+    }
+
+    if (!(await checkIfUserIsMediaOwner(userId, mediaId))) {
+      throw new UnauthorizedError("Media does not belong to this user");
+    }
+
+    const media = await mediaId.getMediaByMediaId(mediaId);
+
+    res.status(200).json({
+      media,
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.delete("/:memoryId", auth, async (req, res, next) => {
+  try {
+    const { userId } = req.user;
+    const { mediaId } = req.params;
+
+    if (!(await checkIfMediaExists(mediaId))) {
+      throw new BadRequestError("Media does not exist");
+    }
+
+    if (!(await checkIfUserIsMediaOwner(userId, mediaId))) {
+      throw new UnauthorizedError("Media does not belong to this user");
+    }
+
+    const deletedMedia = await mediaService.deleteMediaByMemory(memoryId);
+
+    res.status(200).json({
+      memory: deletedMedia,
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.post(
+  "/positions",
+  auth,
+  [check("updates", "At least one position needs to be updated").notEmpty()],
+  async (req, res, next) => {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        throw new BadRequestError(
+          errors
+            .array()
+            .map((err) => err.msg)
+            .join(", ")
+        );
+      }
+
+      const { userId } = req.user;
+      const { memoryId, updates } = req.body;
+
+      if (!(await checkIfMemoryExists(memoryId))) {
+        throw new BadRequestError("Memory does not exist");
+      }
+
+      if (!(await checkIfUserIsMemoryOwner(userId, memoryId))) {
+        throw new UnauthorizedError("Memory does not belong to this user");
+      }
+
+      await mediaService.updatePositions(updates);
+
+      res.status(200).json({
+        memoryId: memoryId,
+        updates: updates,
+      });
+    } catch (err) {
+      next(err);
+    }
+  }
+);
+
+module.exports = router;

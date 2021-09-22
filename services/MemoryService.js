@@ -37,14 +37,7 @@ class MemoryService {
           WHERE memory_id = $6
           RETURNING *
         `,
-        [
-          lineId,
-          title,
-          description,
-          latitude,
-          longitude,
-          memoryId,
-        ]
+        [lineId, title, description, latitude, longitude, memoryId]
       );
       return camelizeKeys(updatedMemory.rows[0]);
     } catch (err) {

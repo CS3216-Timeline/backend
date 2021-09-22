@@ -7,12 +7,16 @@ const MemoryService = require("../services/MemoryService");
 const memoryService = new MemoryService();
 
 const multer = require("multer");
-const LineService = require("../services/LineService");
-const lineService = new LineService();
+
 const StorageService = require("../services/StorageService");
 const storageService = new StorageService();
 const MediaService = require("../services/MediaService");
 const mediaService = new MediaService();
+const {
+  checkIfMemoryExists,
+  checkIfUserIsLineOwner,
+  checkIfUserIsMemoryOwner,
+} = require("../services/util");
 const upload = multer();
 
 router.post(
@@ -124,7 +128,6 @@ router.delete("/:memoryId", auth, async (req, res, next) => {
     }
 
     deletedMemory["media"] = deletedMedia;
-
     res.status(200).json({
       memory: deletedMemory,
     });
@@ -193,30 +196,5 @@ router.patch(
     }
   }
 );
-
-async function checkIfMemoryExists(memoryId) {
-  const memory = await memoryService.getMemoryByMemoryId(memoryId);
-  return memory !== undefined;
-}
-
-async function checkIfUserIsLineOwner(userId, lineId) {
-  const line = await lineService.getLineByLineId(lineId);
-  return line["userId"] === userId;
-}
-
-async function checkIfUserIsMemoryOwner(userId, memoryId) {
-  const memory = await memoryService.getMemoryByMemoryId(memoryId);
-  const userLines = await lineService.getAllLinesByUserId(userId);
-  memoryLineId = memory["lineId"];
-
-  for (var i = 0; i < userLines.length; i += 1) {
-    line = userLines[i];
-    if (memoryLineId === line["lineId"]) {
-      return true;
-    }
-  }
-
-  return false;
-}
 
 module.exports = router;
