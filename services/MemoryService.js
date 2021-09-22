@@ -1,6 +1,7 @@
 const pool = require("../db/db");
 const camelizeKeys = require("../db/utils");
 const { NotFoundError } = require("../errors/errors");
+const logger = require("../middleware/logger")
 
 class MemoryService {
   constructor() {}

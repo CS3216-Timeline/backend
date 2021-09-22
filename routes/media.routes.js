@@ -5,6 +5,7 @@ const { BadRequestError, UnauthorizedError } = require("../errors/errors");
 const auth = require("../middleware/auth");
 const MemoryService = require("../services/MemoryService");
 const memoryService = new MemoryService();
+const logger = require("../middleware/logger");
 
 const multer = require("multer");
 const {

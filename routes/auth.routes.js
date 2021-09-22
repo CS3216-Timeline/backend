@@ -14,6 +14,7 @@ const client = new OAuth2Client(process.env.GOOGLE_APP_ID);
 const userService = new UserService();
 const minPasswordLength = 5;
 const { getAuth, signInWithCustomToken } = require("firebase/auth");
+const logger = require("../middleware/logger")
 
 function generateAccessToken(userId, res) {
   jwt.sign(

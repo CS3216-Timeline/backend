@@ -2,6 +2,7 @@ const pool = require("../db/db");
 const camelizeKeys = require("../db/utils");
 const { snakeCase } = require("lodash");
 const { NotFoundError } = require("../errors/errors");
+const logger = require("../middleware/logger")
 
 class LineService {
   constructor() {}

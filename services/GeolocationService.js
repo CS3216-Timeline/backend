@@ -1,6 +1,7 @@
 const axios = require("axios")
 require("dotenv").config();
 const mapboxApiKey = process.env.MAPBOX_APP_SECRET
+const logger = require("../middleware/logger")
 
 const STARTING_URL = "https://api.mapbox.com/geocoding/v5/mapbox.places/";
 
