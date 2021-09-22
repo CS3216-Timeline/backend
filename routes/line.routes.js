@@ -73,7 +73,7 @@ router.get("/:lineId", auth, async (req, res, next) => {
       line.lastUpdatedDate = lineWithMemories[0].lastUpdatedDate;
       line.memories = [];
       for (let memory of lineWithMemories) {
-        if (memory.memoryId == "null") {
+        if (memory.memoryId == null) {
           console.log("No memories");
           break;
         }
