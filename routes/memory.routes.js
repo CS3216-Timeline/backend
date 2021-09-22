@@ -165,7 +165,7 @@ router.patch(
 
       const { userId } = req.user;
       const { memoryId } = req.params;
-      const { title, line, description, creationDate, latitude, longitude } =
+      const { title, line, description, latitude, longitude } =
         req.body;
 
       if (!(await checkIfMemoryExists(memoryId))) {
