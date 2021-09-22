@@ -35,7 +35,7 @@ CREATE TABLE media(
     url VARCHAR UNIQUE NOT NULL,
     memory_id SERIAL NOT NULL REFERENCES memories(memory_id) ON DELETE CASCADE,
     position INT NOT NULL,
-    UNIQUE (memory_id, position) DEFERRABLE INITIALLY DEFERRED;
+    UNIQUE (memory_id, position) DEFERRABLE INITIALLY DEFERRED
 );
 
 CREATE OR REPLACE FUNCTION refresh_updated_date() RETURNS TRIGGER
