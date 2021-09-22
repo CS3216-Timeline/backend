@@ -7,7 +7,7 @@ CREATE TABLE users(
     email VARCHAR UNIQUE NOT NULL,
     name VARCHAR NOT NULL,
     password VARCHAR,
-    picture_url VARCHAR,
+    picture_url VARCHAR
 );
 
 CREATE TABLE lines(
