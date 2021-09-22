@@ -78,7 +78,7 @@ router.get("/:mediaId", auth, async (req, res, next) => {
       throw new UnauthorizedError("Media does not belong to this user");
     }
 
-    const media = await mediaId.getMediaByMediaId(mediaId);
+    const media = await mediaService.getMediaByMediaId(mediaId);;
 
     res.status(200).json({
       media,
