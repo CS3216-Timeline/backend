@@ -19,6 +19,7 @@ const {
   isValidDate,
 } = require("../services/util");
 const upload = multer();
+const logger = require("../middleware/logger");
 
 router.post(
   "/",
@@ -72,12 +73,12 @@ router.post(
       }
 
       memory["media"] = memoryMedia;
-      console.log(memory);
 
       res.status(200).json({
         memory,
       });
     } catch (err) {
+      logger.logError(err);
       next(err);
     }
   }
@@ -103,6 +104,7 @@ router.get("/:year/:month/:day", auth, async (req, res, next) => {
       memories,
     });
   } catch (err) {
+    logger.logError(req, err);
     next(err);
   }
 });
@@ -126,6 +128,7 @@ router.get("/:year/:month", auth, async (req, res, next) => {
       numberOfMemories,
     });
   } catch (err) {
+    logger.logError(req, err);
     next(err);
   }
 });
@@ -134,7 +137,6 @@ router.get("/:memoryId", auth, async (req, res, next) => {
   try {
     const { userId } = req.user;
     const { memoryId } = req.params;
-
     if (!(await checkIfMemoryExists(memoryId))) {
       throw new BadRequestError("Memory does not exist");
     }
@@ -146,11 +148,11 @@ router.get("/:memoryId", auth, async (req, res, next) => {
     const memory = await memoryService.getMemoryByMemoryId(memoryId);
     let memoryMedia = await mediaService.getAllMediaByMemory(memoryId);
     memory["media"] = memoryMedia;
-
     res.status(200).json({
       memory,
     });
   } catch (err) {
+    logger.logError(req, err);
     next(err);
   }
 });
@@ -180,6 +182,7 @@ router.delete("/:memoryId", auth, async (req, res, next) => {
       memory: deletedMemory,
     });
   } catch (err) {
+    logger.logError(req, err);
     next(err);
   }
 });
@@ -239,6 +242,7 @@ router.patch(
         memory,
       });
     } catch (err) {
+      logger.logError(req, err);
       next(err);
     }
   }

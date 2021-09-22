@@ -36,10 +36,10 @@ function generateAccessToken(userId, res) {
 
 router.get("/", auth, async (req, res, next) => {
   try {
-    console.log(req.user.userId);
     const user = await userService.findUserById(req.user.userId);
     res.json(user);
   } catch (err) {
+    logger.logError(err)
     next(err);
   }
 });
@@ -75,6 +75,7 @@ router.post(
       const user = await userService.createUser(email, name, password, null); // TODO: upload picture and get url
       generateAccessToken(user.userId, res);
     } catch (err) {
+      logger.logError(err)
       next(err);
     }
   }
@@ -118,9 +119,9 @@ router.post(
       if (!(await bcrypt.compare(password, user.password))) {
         throw new BadRequestError("Incorrect Password");
       }
-      console.log(user);
       generateAccessToken(user.userId, res);
     } catch (err) {
+      logger.logError(err)
       next(err);
     }
   }
@@ -142,10 +143,9 @@ router.post("/login/google", async (req, res, next) => {
     if (!user) {
       user = await userService.createUser(email, name, null, null); // TODO: upload picture and get url
     }
-    console.log(user);
     generateAccessToken(user.userId, res);
   } catch (err) {
-    console.log(err);
+    logger.logError(err)
     next(err);
   }
 });
@@ -157,10 +157,6 @@ const facebookAuth = passport.authenticate("facebook-token", {
 
 const fbLogin = (req, res, next) => {
   if (req.user) {
-    console.log("Successful login via Facebook.");
-    console.log(req.authInfo);
-    console.log("_____________________");
-    console.log(req.user.userId);
     generateAccessToken(req.user.userId, res);
     // generateAccessToken(req.authInfo.userId, res);
   }
@@ -168,7 +164,6 @@ const fbLogin = (req, res, next) => {
 
 const fbLoginError = (err, req, res, next) => {
   if (err) {
-    console.log("Error logging in via Facebook.");
     res.status(401).json({
       error: err,
     });

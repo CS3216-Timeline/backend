@@ -27,6 +27,7 @@ class UserService {
       );
       return camelizeKeys(newUser.rows[0]);
     } catch (err) {
+      logger.logErrorWithoutRequest(err);
       throw err;
     }
   }
@@ -38,6 +39,7 @@ class UserService {
       ]);
       return camelizeKeys(user.rows[0]);
     } catch (err) {
+      logger.logErrorWithoutRequest(err);
       throw err;
     }
   }
@@ -50,6 +52,7 @@ class UserService {
       );
       return camelizeKeys(user.rows[0]);
     } catch (err) {
+      logger.logErrorWithoutRequest(err);
       throw err;
     }
   }
@@ -62,6 +65,7 @@ class UserService {
       );
       return camelizeKeys(password.rows[0]);
     } catch (err) {
+      logger.logErrorWithoutRequest(err);
       throw err;
     }
   }
@@ -88,6 +92,7 @@ class UserService {
 
       return camelizeKeys(updatedUser.rows[0]);
     } catch (err) {
+      logger.logErrorWithoutRequest(err);
       throw err;
     }
   }
@@ -103,6 +108,7 @@ class UserService {
       }
       return camelizeKeys(deletedUser.rows[0]);
     } catch (err) {
+      logger.logErrorWithoutRequest(err);
       throw err;
     }
   }
