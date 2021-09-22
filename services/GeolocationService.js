@@ -25,6 +25,7 @@ class GeolocationService {
       });
       return suggestionsFromSearch
     } catch (err) {
+      logger.logErrorWithoutRequest(err)
       throw err
     }
   }
@@ -43,6 +44,7 @@ class GeolocationService {
       });
       return features
     } catch (err) {
+      logger.logErrorWithoutRequest(err)
       throw err
     }
   }

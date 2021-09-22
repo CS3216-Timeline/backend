@@ -51,6 +51,10 @@ class Logger {
   log(level, message) {
     this.#newLogWithoutReq(level, message);
   }
+
+  logErrorWithoutRequest(error) {
+    this.#newLogWithoutReq("error", error.toString());
+  }
 }
 
 module.exports = new Logger();

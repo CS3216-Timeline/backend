@@ -14,6 +14,7 @@ class MediaService {
       );
       return camelizeKeys(newMedia.rows[0]);
     } catch (err) {
+      logger.logErrorWithoutRequest(err)
       throw err;
     }
   }
@@ -26,6 +27,7 @@ class MediaService {
       );
       return camelizeKeys(media.rows);
     } catch (err) {
+      logger.logErrorWithoutRequest(err)
       throw err;
     }
   }
@@ -38,6 +40,7 @@ class MediaService {
       );
       return camelizeKeys(media.rows[0]);
     } catch (err) {
+      logger.logErrorWithoutRequest(err)
       throw err;
     }
   }
@@ -53,6 +56,7 @@ class MediaService {
       }
       return camelizeKeys(deletedMedia.rows[0]);
     } catch (err) {
+      logger.logErrorWithoutRequest(err)
       throw err;
     }
   }
@@ -68,6 +72,7 @@ class MediaService {
       }
       return camelizeKeys(deletedMedia.rows);
     } catch (err) {
+      logger.logErrorWithoutRequest(err)
       throw err;
     }
   }
@@ -85,6 +90,7 @@ class MediaService {
       }
       await pool.query("COMMIT");
     } catch (err) {
+      logger.logErrorWithoutRequest(err)
       await pool.query("ROLLBACK");
       throw new BadRequestError("Invalid positioning");
     }

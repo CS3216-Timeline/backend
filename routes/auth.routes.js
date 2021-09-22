@@ -39,6 +39,7 @@ router.get("/", auth, async (req, res, next) => {
     const user = await userService.findUserById(req.user.userId);
     res.json(user);
   } catch (err) {
+    logger.logError(err)
     next(err);
   }
 });
@@ -74,6 +75,7 @@ router.post(
       const user = await userService.createUser(email, name, password, null); // TODO: upload picture and get url
       generateAccessToken(user.userId, res);
     } catch (err) {
+      logger.logError(err)
       next(err);
     }
   }
@@ -119,6 +121,7 @@ router.post(
       }
       generateAccessToken(user.userId, res);
     } catch (err) {
+      logger.logError(err)
       next(err);
     }
   }
@@ -142,6 +145,7 @@ router.post("/login/google", async (req, res, next) => {
     }
     generateAccessToken(user.userId, res);
   } catch (err) {
+    logger.logError(err)
     next(err);
   }
 });

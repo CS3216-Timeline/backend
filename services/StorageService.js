@@ -42,7 +42,7 @@ class StorageService {
     const imgRef = ref(storage, imgUrl);
     deleteObject(imgRef)
       .catch((err) => {
-        logger.log('error', )
+        logger.logErrorWithoutRequest(err)
       });
   }
 

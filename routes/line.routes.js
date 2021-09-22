@@ -19,6 +19,7 @@ router.get("/", auth, async (req, res, next) => {
       lines,
     });
   } catch (err) {
+    logger.logError(err)
     next(err);
   }
 });
@@ -51,6 +52,7 @@ router.post(
         line,
       });
     } catch (err) {
+      logger.logError(err)
       next(err);
     }
   }
@@ -99,6 +101,7 @@ router.get("/:lineId", auth, async (req, res, next) => {
       throw new UnauthorizedError("You do not have access to this line");
     }
   } catch (err) {
+    logger.logError(err)
     next(err);
   }
 });
@@ -139,6 +142,7 @@ router.patch(
         line,
       });
     } catch (err) {
+      logger.logError(err)
       next(err);
     }
   }
@@ -154,6 +158,7 @@ router.delete("/:lineId", auth, async (req, res, next) => {
       line,
     });
   } catch (err) {
+    logger.logError(err)
     next(err);
   }
 });
