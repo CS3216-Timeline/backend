@@ -63,10 +63,10 @@ class MediaService {
         "DELETE FROM media WHERE memory_id = $1 RETURNING *",
         [memoryId]
       );
-      // if (!deletedMedia.rows[0]) {
-      //   throw new NotFoundError("Memory does not exist, cannot delete");
-      // }
-      return camelizeKeys(deletedMedia.rows[0]);
+      if (!deletedMedia.rows[0]) {
+        throw new NotFoundError("Memory does not exist, cannot delete");
+      }
+      return camelizeKeys(deletedMedia.rows);
     } catch (err) {
       throw err;
     }

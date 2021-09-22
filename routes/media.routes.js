@@ -87,10 +87,11 @@ router.get("/:mediaId", auth, async (req, res, next) => {
   }
 });
 
-router.delete("/:memoryId", auth, async (req, res, next) => {
+router.delete("/:mediaId", auth, async (req, res, next) => {
   try {
     const { userId } = req.user;
     const { mediaId } = req.params;
+    const { memoryId } = req.body;
 
     if (!(await checkIfMediaExists(mediaId))) {
       throw new BadRequestError("Media does not exist");
@@ -100,7 +101,24 @@ router.delete("/:memoryId", auth, async (req, res, next) => {
       throw new UnauthorizedError("Media does not belong to this user");
     }
 
-    const deletedMedia = await mediaService.deleteMediaByMemory(memoryId);
+    const deletedMedia = await mediaService.deleteMediaById(mediaId);
+    const remainingMedia = await mediaService.getAllMediaByMemory(memoryId);
+    let updates = [];
+    const deletedPos = parseInt(deletedMedia["position"]);
+
+    for (let i = 0; i < remainingMedia.length; i++) {
+      pos = parseInt(remainingMedia[i]["position"]);
+      if (pos > deletedPos) {
+        pos -= 1;
+        update = {
+          mediaId: remainingMedia[i]["mediaId"],
+          position: pos.toString(),
+        };
+        updates.push(update);
+      }
+    }
+
+    await mediaService.updatePositions(updates);
 
     res.status(200).json({
       memory: deletedMedia,

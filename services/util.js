@@ -16,7 +16,8 @@ async function checkIfMediaExists(mediaId) {
 }
 
 async function checkIfUserIsMediaOwner(userId, mediaId) {
-  const memoryId = await mediaService.getMediaByMediaId(mediaId);
+  const memory = await mediaService.getMediaByMediaId(mediaId);
+  const memoryId = memory["memoryId"];
   return checkIfUserIsMemoryOwner(userId, memoryId);
 }
 

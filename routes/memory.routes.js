@@ -120,13 +120,13 @@ router.delete("/:memoryId", auth, async (req, res, next) => {
       throw new UnauthorizedError("Memory does not belong to this user");
     }
 
-    const deletedMemory = await memoryService.deleteMemoryById(memoryId);
     const deletedMedia = await mediaService.deleteMediaByMemory(memoryId);
     for (let i = 0; i < deletedMedia.length; i++) {
       const url = deletedMedia[i]["url"];
       await storageService.deleteImage(url);
     }
 
+    const deletedMemory = await memoryService.deleteMemoryById(memoryId);
     deletedMemory["media"] = deletedMedia;
     res.status(200).json({
       memory: deletedMemory,
