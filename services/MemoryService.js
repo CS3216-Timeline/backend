@@ -104,7 +104,10 @@ class MemoryService {
   async getMemoriesByDay(userId, day, month, year) {
     try {
       const memories = await pool.query(
-        `SELECT M.* FROM memories M JOIN lines L ON M.line_id = L.line_id
+        `SELECT M.*, (
+            SELECT url FROM media WHERE memory_id = M.memory_id ORDER BY position LIMIT 1
+          ) AS thumbnail_url 
+          FROM memories M JOIN lines L ON M.line_id = L.line_id
           WHERE L.user_id = $1
           AND date_part('day',creation_date) = $2
           AND date_part('month',creation_date) = $3
