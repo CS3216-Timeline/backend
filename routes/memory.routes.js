@@ -137,7 +137,6 @@ router.get("/:memoryId", auth, async (req, res, next) => {
   try {
     const { userId } = req.user;
     const { memoryId } = req.params;
-
     if (!(await checkIfMemoryExists(memoryId))) {
       throw new BadRequestError("Memory does not exist");
     }

@@ -19,14 +19,14 @@ class Logger {
 
   #newLogWithReq(req, level, message) {
     const url = req.baseUrl + req.path;
-    logger.log({
+    this.logger.log({
       message: `${url}: ${message}`,
       level,
     });
   }
 
   #newLogWithoutReq(req, level, message) {
-    logger.log({
+    this.logger.log({
       message: message,
       level,
     });
