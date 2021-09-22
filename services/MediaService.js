@@ -62,7 +62,6 @@ class MediaService {
         "DELETE FROM media WHERE memory_id = $1 RETURNING *",
         [memoryId]
       );
-      console.log("deleted media ", deletedMedia);
       if (!deletedMedia.rows[0]) {
         throw new NotFoundError("Memory does not exist, cannot delete");
       }

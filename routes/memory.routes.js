@@ -40,14 +40,14 @@ router.post(
       }
 
       const { userId } = req.user;
-      const { title, lineId, description, latitude, longitude } = req.body;
+      const { title, line, description, latitude, longitude } = req.body;
 
-      if (!(await checkIfUserIsLineOwner(userId, lineId))) {
+      if (!(await checkIfUserIsLineOwner(userId, line))) {
         throw new UnauthorizedError("Line does not belong to this user");
       }
 
       const memory = await memoryService.createMemory(
-        lineId,
+        line,
         title,
         description,
         latitude,
@@ -78,60 +78,52 @@ router.post(
   }
 );
 
-router.get(
-  "/:memoryId",
-  auth,
-  async (req, res, next) => {
-    try {
-      const { userId } = req.user;
-      const { memoryId } = req.params;
+router.get("/:memoryId", auth, async (req, res, next) => {
+  try {
+    const { userId } = req.user;
+    const { memoryId } = req.params;
 
-      if (!(await checkIfMemoryExists(memoryId))) {
-        throw new BadRequestError("Memory does not exist");
-      }
-
-      if (!(await checkIfUserIsMemoryOwner(userId, memoryId))) {
-        throw new UnauthorizedError("Memory does not belong to this user");
-      }
-
-      const memories = await memoryService.getMemoryByMemoryId(memoryId);
-      res.status(200).json({
-        memories,
-      });
-    } catch (err) {
-      next(err);
+    if (!(await checkIfMemoryExists(memoryId))) {
+      throw new BadRequestError("Memory does not exist");
     }
-  }
-);
 
-router.delete(
-  "/:memoryId",
-  auth,
-  async (req, res, next) => {
-    try {
-      const { userId } = req.user;
-      const { memoryId } = req.params;
-
-      if (!(await checkIfMemoryExists(memoryId))) {
-        throw new BadRequestError("Memory does not exist");
-      }
-
-      if (!(await checkIfUserIsMemoryOwner(userId, memoryId))) {
-        throw new UnauthorizedError("Memory does not belong to this user");
-      }
-
-      const deletedMemory = await memoryService.deleteMemoryById(memoryId);
-      const deletedMedia = await mediaService.deleteMediaByMemory(memoryId);
-      deletedMemory["media"] = deletedMedia;
-
-      res.status(200).json({
-        memory: deletedMemory,
-      });
-    } catch (err) {
-      next(err);
+    if (!(await checkIfUserIsMemoryOwner(userId, memoryId))) {
+      throw new UnauthorizedError("Memory does not belong to this user");
     }
+
+    const memories = await memoryService.getMemoryByMemoryId(memoryId);
+    res.status(200).json({
+      memories,
+    });
+  } catch (err) {
+    next(err);
   }
-);
+});
+
+router.delete("/:memoryId", auth, async (req, res, next) => {
+  try {
+    const { userId } = req.user;
+    const { memoryId } = req.params;
+
+    if (!(await checkIfMemoryExists(memoryId))) {
+      throw new BadRequestError("Memory does not exist");
+    }
+
+    if (!(await checkIfUserIsMemoryOwner(userId, memoryId))) {
+      throw new UnauthorizedError("Memory does not belong to this user");
+    }
+
+    const deletedMemory = await memoryService.deleteMemoryById(memoryId);
+    const deletedMedia = await mediaService.deleteMediaByMemory(memoryId);
+    deletedMemory["media"] = deletedMedia;
+
+    res.status(200).json({
+      memory: deletedMemory,
+    });
+  } catch (err) {
+    next(err);
+  }
+});
 
 router.patch(
   "/:memoryId",
@@ -162,7 +154,8 @@ router.patch(
 
       const { userId } = req.user;
       const { memoryId } = req.params;
-      const { title, lineId, description, creationDate, latitude, longitude } = req.body;
+      const { title, line, description, creationDate, latitude, longitude } =
+        req.body;
 
       if (!(await checkIfMemoryExists(memoryId))) {
         throw new BadRequestError("Memory does not exist");
@@ -174,7 +167,7 @@ router.patch(
 
       const memory = await memoryService.updateMemory(
         memoryId,
-        lineId,
+        line,
         title,
         description,
         creationDate,
