@@ -78,7 +78,7 @@ router.post(
         memory,
       });
     } catch (err) {
-      logger.logError(err);
+      logger.logError(req, err);
       next(err);
     }
   }

@@ -14,7 +14,7 @@ const client = new OAuth2Client(process.env.GOOGLE_APP_ID);
 const userService = new UserService();
 const minPasswordLength = 5;
 const { getAuth, signInWithCustomToken } = require("firebase/auth");
-const logger = require("../middleware/logger")
+const logger = require("../middleware/logger");
 
 function generateAccessToken(userId, res) {
   jwt.sign(
@@ -40,7 +40,7 @@ router.get("/", auth, async (req, res, next) => {
     const user = await userService.findUserById(req.user.userId);
     res.json(user);
   } catch (err) {
-    logger.logError(err)
+    logger.logError(req, err);
     next(err);
   }
 });
@@ -76,7 +76,7 @@ router.post(
       const user = await userService.createUser(email, name, password, null); // TODO: upload picture and get url
       generateAccessToken(user.userId, res);
     } catch (err) {
-      logger.logError(err)
+      logger.logError(req, err);
       next(err);
     }
   }
@@ -122,7 +122,7 @@ router.post(
       }
       generateAccessToken(user.userId, res);
     } catch (err) {
-      logger.logError(err)
+      logger.logError(req, err);
       next(err);
     }
   }
@@ -146,7 +146,7 @@ router.post("/login/google", async (req, res, next) => {
     }
     generateAccessToken(user.userId, res);
   } catch (err) {
-    logger.logError(err)
+    logger.logError(req, err)
     next(err);
   }
 });

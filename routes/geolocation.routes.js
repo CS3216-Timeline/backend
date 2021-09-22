@@ -17,7 +17,7 @@ router.get("/locations", auth, async (req, res, next) => {
       suggestions
     })
   } catch (err) {
-    logger.logError(err)
+    logger.logError(req, err)
     next(err);
   }
 });
@@ -33,7 +33,7 @@ router.get("/features", auth, async (req, res, next) => {
       features
     })
   } catch (err) {
-    logger.logError(err)
+    logger.logError(req, err)
     next(err);
   }
 });

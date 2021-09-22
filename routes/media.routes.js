@@ -61,7 +61,7 @@ router.post(
         media: curMedia,
       });
     } catch (err) {
-      logger.logError(err);
+      logger.logError(req, err);
       next(err);
     }
   }
@@ -86,7 +86,7 @@ router.get("/:mediaId", auth, async (req, res, next) => {
       media,
     });
   } catch (err) {
-    logger.logError(err);
+    logger.logError(req, err);
     next(err);
   }
 });
@@ -128,7 +128,7 @@ router.delete("/:mediaId", auth, async (req, res, next) => {
       media: deletedMedia,
     });
   } catch (err) {
-    logger.logError(err);
+    logger.logError(req, err);
     next(err);
   }
 });
@@ -167,7 +167,7 @@ router.post(
         updates: updates,
       });
     } catch (err) {
-      logger.logError(err);
+      logger.logError(req, err);
       next(err);
     }
   }
