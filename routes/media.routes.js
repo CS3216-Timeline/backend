@@ -124,7 +124,7 @@ router.delete("/:mediaId", auth, async (req, res, next) => {
     await mediaService.updatePositions(updates);
 
     res.status(200).json({
-      memory: deletedMedia,
+      media: deletedMedia,
     });
   } catch (err) {
     logger.logError(err);
