@@ -7,6 +7,7 @@ const {
 } = require("firebase/storage");
 const { v4: uuidv4 } = require("uuid");
 require("dotenv").config();
+const logger = require("../middleware/logger");
 
 const firebaseConfig = {
   apiKey: process.env.FIREBASE_API_KEY,
@@ -40,11 +41,8 @@ class StorageService {
   async deleteImage(imgUrl) {
     const imgRef = ref(storage, imgUrl);
     deleteObject(imgRef)
-      .then(() => {
-        console.log("deleted");
-      })
-      .catch((error) => {
-        console.log(error);
+      .catch((err) => {
+        logger.log('error', )
       });
   }
 

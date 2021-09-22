@@ -8,13 +8,20 @@ const config = require("config");
 
 const routes = require("./routes/");
 const { HTTPError } = require("./errors/errors");
+const morgan = require("morgan");
 
 const app = express();
 
 app.use(helmet());
+
+app.use(morgan('combined'));
+
 app.use(express.json());
+
 app.use(express.urlencoded({ extended: true }));
+
 app.use(xss());
+
 app.use(
   cors({
     origin: "*",
