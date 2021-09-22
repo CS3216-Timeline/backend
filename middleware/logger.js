@@ -25,23 +25,15 @@ class Logger {
     });
   }
 
-  #newLogWithoutReq(req, level, message) {
+  #newLogWithoutReq(level, message) {
     this.logger.log({
       message: message,
       level,
     });
   }
 
-  logDebug(req, message) {
-    this.#newLogWithReq(req, "debug", message);
-  }
-
   logInfo(req, message) {
     this.#newLogWithReq(req, "info", message);
-  }
-
-  logWarn(req, message) {
-    this.#newLogWithReq(req, "warn", message);
   }
 
   logError(req, error) {
