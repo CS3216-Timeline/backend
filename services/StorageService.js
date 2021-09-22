@@ -1,10 +1,5 @@
 const { initializeApp } = require("firebase/app");
-const {
-  getStorage,
-  ref,
-  uploadBytes,
-  getDownloadURL,
-} = require("firebase/storage");
+const { getStorage, ref, uploadBytes } = require("firebase/storage");
 const { inRange } = require("lodash");
 const { v4: uuidv4 } = require("uuid");
 require("dotenv").config();
@@ -38,9 +33,9 @@ class StorageService {
     });
   }
 
-  async deleteImage(uniqueIdStr) {
-    const imgReg = ref(storage, uniqueIdStr);
-    deleteObject(desertRef)
+  async deleteImage(imgUrl) {
+    const imgRef = storage.refFromUrl(imgUrl);
+    deleteObject(imgRef)
       .then(() => {
         console.log("deleted");
       })

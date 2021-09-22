@@ -91,9 +91,12 @@ router.get("/:memoryId", auth, async (req, res, next) => {
       throw new UnauthorizedError("Memory does not belong to this user");
     }
 
-    const memories = await memoryService.getMemoryByMemoryId(memoryId);
+    const memory = await memoryService.getMemoryByMemoryId(memoryId);
+    let memoryMedia = await mediaService.getAllMediaByMemory(memoryId);
+    memory["media"] = memoryMedia;
+
     res.status(200).json({
-      memories,
+      memory,
     });
   } catch (err) {
     next(err);
@@ -115,6 +118,11 @@ router.delete("/:memoryId", auth, async (req, res, next) => {
 
     const deletedMemory = await memoryService.deleteMemoryById(memoryId);
     const deletedMedia = await mediaService.deleteMediaByMemory(memoryId);
+    for (let i = 0; i < deletedMedia.length; i++) {
+      const url = deletedMedia[i]["url"];
+      await storageService.deleteImage(url);
+    }
+
     deletedMemory["media"] = deletedMedia;
 
     res.status(200).json({
@@ -170,10 +178,12 @@ router.patch(
         line,
         title,
         description,
-        creationDate,
         latitude,
         longitude
       );
+
+      let memoryMedia = await mediaService.getAllMediaByMemory(memoryId);
+      memory["media"] = memoryMedia;
 
       res.status(200).json({
         memory,

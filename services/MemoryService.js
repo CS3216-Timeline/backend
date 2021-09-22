@@ -22,7 +22,6 @@ class MemoryService {
     lineId,
     title,
     description,
-    creationDate,
     latitude,
     longitude
   ) {
@@ -33,17 +32,15 @@ class MemoryService {
           SET line_id = COALESCE($1, line_id),
             title = COALESCE($2, title),
             description = COALESCE($3, description),
-            creation_date = COALESCE($4, creation_date),
-            latitude = COALESCE($5, latitude),
-            longitude = COALESCE($6, longitude)
-          WHERE memory_id = $7
+            latitude = COALESCE($4, latitude),
+            longitude = COALESCE($5, longitude)
+          WHERE memory_id = $6
           RETURNING *
         `,
         [
           lineId,
           title,
           description,
-          creationDate,
           latitude,
           longitude,
           memoryId,
