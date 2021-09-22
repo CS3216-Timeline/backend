@@ -44,19 +44,20 @@ router.post(
       }
 
       let curMedia = await mediaService.getAllMediaByMemory(memoryId);
+      const offset = curMedia.length;
       const images = req.files;
       for (let i = 0; i < images.length; i++) {
         const url = await storageService.uploadImage(images[i]);
-        const newMedia = mediaService.createMedia(
+        const newMedia = await mediaService.createMedia(
           url,
           memoryId,
-          images.length + i
+          offset + i
         );
         curMedia.push(newMedia);
       }
 
       res.status(200).json({
-        media,
+        media: curMedia,
       });
     } catch (err) {
       next(err);
