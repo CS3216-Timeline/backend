@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const { check, oneOf, validationResult } = require("express-validator");
 const { BadRequestError, UnauthorizedError } = require("../errors/errors");
-const passport = require("passport");
+const auth = require("../middleware/auth");
 const MemoryService = require("../services/MemoryService");
 const memoryService = new MemoryService();
 
@@ -13,7 +13,7 @@ const upload = multer();
 
 router.post(
   "/",
-  passport.authenticate(["jwt"], { session: false }),
+  auth,
   upload.array("images", 10),
   [
     //TODO: Check which fields are necessary
@@ -35,12 +35,8 @@ router.post(
         );
       }
 
-      const userId = req.user.userId;
-      const title = req.body["title"];
-      const lineId = req.body["line"];
-      const description = req.body["description"];
-      const latitude = req.body["latitude"];
-      const longitude = req.body["longitude"];
+      const { userId } = req.user;
+      const { title, lineId, description, latitude, longitude } = req.body;
 
       if (!(await checkIfUserIsLineOwner(userId, lineId))) {
         throw new UnauthorizedError("Line does not belong to this user");
@@ -65,11 +61,11 @@ router.post(
 
 router.get(
   "/:memoryId",
-  passport.authenticate(["jwt"], { session: false }),
+  auth,
   async (req, res, next) => {
     try {
-      const memoryId = req.params.memoryId;
-      const userId = req.user.userId;
+      const { userId } = req.user;
+      const { memoryId } = req.params;
 
       if (!(await checkIfUserIsMemoryOwner(userId, memoryId))) {
         throw new UnauthorizedError("Memory does not belong to this user");
@@ -87,11 +83,11 @@ router.get(
 
 router.delete(
   "/:memoryId",
-  passport.authenticate(["jwt"], { session: false }),
+  auth,
   async (req, res, next) => {
     try {
-      const memoryId = req.params.memoryId;
-      const userId = req.user.userId;
+      const { userId } = req.user;
+      const { memoryId } = req.params;
 
       if (!(await checkIfUserIsMemoryOwner(userId, memoryId))) {
         throw new UnauthorizedError("Memory does not belong to this user");
@@ -109,7 +105,7 @@ router.delete(
 
 router.patch(
   "/:memoryId",
-  passport.authenticate(["jwt"], { session: false }),
+  auth,
   [
     oneOf(
       [
@@ -134,14 +130,9 @@ router.patch(
         );
       }
 
-      const userId = req.user.userId;
-      const memoryId = req.params.memoryId;
-      const title = req.body["title"];
-      const lineId = req.body["line"];
-      const description = req.body["description"];
-      const creationDate = req.body["creationDate"];
-      const latitude = req.body["latitude"];
-      const longitude = req.body["longitude"];
+      const { userId } = req.user;
+      const { memoryId } = req.params;
+      const { title, lineId, description, creationDate, latitude, longitude } = req.body;
 
       if (!(await checkIfUserIsMemoryOwner(userId, memoryId))) {
         throw new UnauthorizedError("Memory does not belong to this user");

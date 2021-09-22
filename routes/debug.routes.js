@@ -1,11 +1,11 @@
 const express = require("express");
 const router = express.Router();
-const passport = require("passport");
+const auth = require("../middleware/auth");
 require("dotenv").config();
 
 router.get(
   "/auth",
-  passport.authenticate(["jwt"], { session: false }),
+  auth,
   async (req, res, next) => {
     res.send("you are authenticated!");
   }
