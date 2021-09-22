@@ -48,7 +48,7 @@ class Logger {
     this.#newLogWithReq(req, "error", error.toString());
   }
 
-  log(level, message) {
+  logWithoutRequest(level, message) {
     this.#newLogWithoutReq(level, message);
   }
 
