@@ -16,6 +16,7 @@ const {
   checkIfMemoryExists,
   checkIfUserIsLineOwner,
   checkIfUserIsMemoryOwner,
+  isValidDate,
 } = require("../services/util");
 const upload = multer();
 
@@ -86,6 +87,11 @@ router.get("/:year/:month/:day", auth, async (req, res, next) => {
   try {
     const { userId } = req.user;
     const { year, month, day } = req.params;
+
+    if (!isValidDate(year, month, day)) {
+      throw new BadRequestError("Not a valid date");
+    }
+
     let memories = await memoryService.getMemoriesByDay(
       userId,
       day,
@@ -105,6 +111,11 @@ router.get("/:year/:month", auth, async (req, res, next) => {
   try {
     const { userId } = req.user;
     const { year, month } = req.params;
+
+    if (!isValidDate(year, month, 1)) {
+      throw new BadRequestError("Not a valid date");
+    }
+
     let numberOfMemories = await memoryService.getNumberOfMemoriesByDays(
       userId,
       month,
