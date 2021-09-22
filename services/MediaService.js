@@ -1,11 +1,10 @@
-const pool = require('../db/db');
-const camelizeKeys = require('../db/utils');
-const {
-  NotFoundError
-} = require('../errors/errors');
+const pool = require("../db/db");
+const camelizeKeys = require("../db/utils");
+const { NotFoundError, BadRequestError } = require("../errors/errors");
+const StorageService = require("./StorageService");
 
 class MediaService {
-  constructor() { }
+  constructor() {}
 
   async createMedia(url, memoryId, position) {
     try {
@@ -45,17 +44,51 @@ class MediaService {
 
   async deleteMediaById(mediaId) {
     try {
-      const deletedMedia = await pool.query("DELETE FROM media WHERE media_id = $1 RETURNING *", [
-        mediaId
-      ]);
+      const deletedMedia = await pool.query(
+        "DELETE FROM media WHERE media_id = $1 RETURNING *",
+        [mediaId]
+      );
       if (!deletedMedia.rows[0]) {
-        throw NotFoundError('Media does not exist, cannot delete');
+        throw new NotFoundError("Media does not exist, cannot delete");
       }
       return camelizeKeys(deletedMedia.rows[0]);
     } catch (err) {
       throw err;
     }
   }
+
+  async deleteMediaByMemory(memoryId) {
+    try {
+      const deletedMedia = await pool.query(
+        "DELETE FROM media WHERE memory_id = $1 RETURNING *",
+        [memoryId]
+      );
+      if (!deletedMedia.rows[0]) {
+        throw new NotFoundError("Memory does not exist, cannot delete");
+      }
+      return camelizeKeys(deletedMedia.rows);
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  async updatePositions(updates) {
+    try {
+      await pool.query("BEGIN");
+      for (let i = 0; i < updates.length; i++) {
+        const newPosition = updates[i]["position"];
+        const mediaId = updates[i]["mediaId"];
+        await pool.query(
+          "UPDATE media SET position=$1 where media_id=$2 RETURNING *",
+          [newPosition, mediaId]
+        );
+      }
+      await pool.query("COMMIT");
+    } catch (err) {
+      await pool.query("ROLLBACK");
+      throw new BadRequestError("Invalid positioning");
+    }
+  }
 }
 
-module.exports = MediaService
+module.exports = MediaService;
