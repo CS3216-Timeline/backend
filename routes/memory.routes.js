@@ -82,6 +82,43 @@ router.post(
   }
 );
 
+router.get("/:year/:month/:day", auth, async (req, res, next) => {
+  try {
+    const { userId } = req.user;
+    const { year, month, day } = req.params;
+    let memories = await memoryService.getMemoriesByDay(
+      userId,
+      day,
+      month,
+      year
+    );
+
+    res.status(200).json({
+      memories,
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.get("/:year/:month", auth, async (req, res, next) => {
+  try {
+    const { userId } = req.user;
+    const { year, month } = req.params;
+    let numberOfMemories = await memoryService.getNumberOfMemoriesByDays(
+      userId,
+      month,
+      year
+    );
+
+    res.status(200).json({
+      numberOfMemories,
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
 router.get("/:memoryId", auth, async (req, res, next) => {
   try {
     const { userId } = req.user;
@@ -165,8 +202,7 @@ router.patch(
 
       const { userId } = req.user;
       const { memoryId } = req.params;
-      const { title, line, description, latitude, longitude } =
-        req.body;
+      const { title, line, description, latitude, longitude } = req.body;
 
       if (!(await checkIfMemoryExists(memoryId))) {
         throw new BadRequestError("Memory does not exist");

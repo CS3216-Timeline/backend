@@ -83,6 +83,39 @@ class MemoryService {
       throw err;
     }
   }
+
+  async getNumberOfMemoriesByDays(userId, month, year) {
+    try {
+      const numberOfMemories = await pool.query(
+        `SELECT date_part('day',creation_date) as day, COUNT(memory_id) as number_of_memories
+          FROM memories M JOIN lines L ON M.line_id = L.line_id
+          WHERE L.user_id = $1
+          AND date_part('month',creation_date) = $2
+          AND date_part('year',creation_date) = $3
+          GROUP BY date_part('day',creation_date)`,
+        [userId, month, year]
+      );
+      return camelizeKeys(numberOfMemories.rows);
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  async getMemoriesByDay(userId, day, month, year) {
+    try {
+      const memories = await pool.query(
+        `SELECT M.* FROM memories M JOIN lines L ON M.line_id = L.line_id
+          WHERE L.user_id = $1
+          AND date_part('day',creation_date) = $2
+          AND date_part('month',creation_date) = $3
+          AND date_part('year',creation_date) = $4`,
+        [userId, day, month, year]
+      );
+      return camelizeKeys(memories.rows);
+    } catch (err) {
+      throw err;
+    }
+  }
 }
 
 module.exports = MemoryService;
