@@ -86,7 +86,7 @@ class MemoryService {
         [memoryId]
       );
       if (!deletedMemory.rows[0]) {
-        throw NotFoundError("Memory does not exist, cannot delete");
+        throw new NotFoundError("Memory does not exist, cannot delete");
       }
       return camelizeKeys(deletedMemory.rows[0]);
     } catch (err) {

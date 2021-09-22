@@ -9,6 +9,10 @@ const memoryService = new MemoryService();
 const multer = require("multer");
 const LineService = require("../services/LineService");
 const lineService = new LineService();
+const StorageService = require("../services/StorageService");
+const storageService = new StorageService();
+const MediaService = require("../services/MediaService");
+const mediaService = new MediaService();
 const upload = multer();
 
 router.post(
@@ -49,6 +53,21 @@ router.post(
         latitude,
         longitude
       );
+
+      const images = req.files;
+      let memoryMedia = [];
+      for (let i = 0; i < images.length; i++) {
+        const url = await storageService.uploadImage(images[i]);
+        const media = await mediaService.createMedia(
+          url,
+          memory["memoryId"],
+          i
+        );
+        memoryMedia.push(media);
+      }
+
+      memory["media"] = memoryMedia;
+      console.log(memory);
 
       res.status(200).json({
         memory,
@@ -101,7 +120,10 @@ router.delete(
         throw new UnauthorizedError("Memory does not belong to this user");
       }
 
-      const deletedMemory = await memoryService.deleteOneById(memoryId);
+      const deletedMemory = await memoryService.deleteMemoryById(memoryId);
+      const deletedMedia = await mediaService.deleteMediaByMemory(memoryId);
+      deletedMemory["media"] = deletedMedia;
+
       res.status(200).json({
         memory: deletedMemory,
       });
