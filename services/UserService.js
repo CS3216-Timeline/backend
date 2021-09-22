@@ -15,8 +15,8 @@ class UserService {
         throw new BadRequestError("Email already used, please login");
       }
       let newUser = null;
-      const hashedPassword = null;
-      if (password != null) {
+      let hashedPassword = null;
+      if (password !== null) {
         // hash the password
         const salt = await bcrypt.genSalt(10);
         hashedPassword = await bcrypt.hash(password, salt);
