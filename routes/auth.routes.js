@@ -1,6 +1,5 @@
 const express = require("express");
 const router = express.Router();
-const config = require("config");
 const jwt = require("jsonwebtoken");
 const { check, validationResult } = require("express-validator");
 const bcrypt = require("bcryptjs");
@@ -19,7 +18,7 @@ const logger = require("../middleware/logger");
 function generateAccessToken(userId, res) {
   jwt.sign(
     {},
-    config.get("jwtSecret"),
+    process.env.JWT_SECRET,
     {
       expiresIn: process.env.JWT_EXPIRY_SECONDS,
       subject: userId.toString(),

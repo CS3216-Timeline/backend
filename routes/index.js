@@ -35,11 +35,13 @@ const routes = [
     path: "/media",
     route: mediaRoutes,
   },
-  {
-    path: "/debug",
-    route: debugRoutes,
-  },
 ];
 
+if (process.env.NODE_ENV === "development") {
+  routes.push({
+    path: "/debug",
+    route: debugRoutes,
+  });
+}
 routes.forEach((r) => router.use(r.path, r.route));
 module.exports = router;
