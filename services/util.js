@@ -27,10 +27,12 @@ async function checkIfUserIsMediaOwner(userId, mediaId) {
 async function checkIfUserIsMemoryOwner(userId, memoryId) {
   const memory = await memoryService.getMemoryByMemoryId(memoryId);
   const userLines = await lineService.getAllLinesByUserId(userId);
-  memoryLineId = memory["lineId"];
   if (!memory) {
     return false;
   }
+
+  memoryLineId = memory["lineId"];
+
   for (var i = 0; i < userLines.length; i += 1) {
     line = userLines[i];
     if (memoryLineId === line["lineId"]) {
