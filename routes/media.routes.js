@@ -19,7 +19,7 @@ const upload = multer();
 router.post(
   "/",
   auth,
-  upload.array("images", process.env.MAX_MEDIA_PER_MEMORY),
+  upload.array("images", parseInt(process.env.MAX_MEDIA_PER_MEMORY)),
   [check("memoryId", "Memory Id cannot be blank").notEmpty()],
   async (req, res, next) => {
     try {
@@ -45,7 +45,10 @@ router.post(
       const initialLength = curMedia.length;
       const addedLength = images.length;
 
-      if (initialLength + addedLength > process.env.MAX_MEDIA_PER_MEMORY) {
+      if (
+        initialLength + addedLength >
+        parseInt(process.env.MAX_MEDIA_PER_MEMORY)
+      ) {
         throw new BadRequestError(
           "Exceeded maximum number of media for this memory"
         );

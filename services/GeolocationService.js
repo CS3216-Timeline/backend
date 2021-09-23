@@ -1,8 +1,8 @@
-const axios = require("axios")
+const axios = require("axios");
 require("dotenv").config();
-const mapboxApiKey = process.env.MAPBOX_APP_SECRET
-const mapboxResultLimit = process.env.MAPBOX_RESULT_LIMIT
-const logger = require("../middleware/logger")
+const mapboxApiKey = process.env.MAPBOX_APP_SECRET;
+const mapboxResultLimit = parseInt(process.env.MAPBOX_RESULT_LIMIT);
+const logger = require("../middleware/logger");
 
 const STARTING_URL = "https://api.mapbox.com/geocoding/v5/mapbox.places/";
 
@@ -25,10 +25,10 @@ class GeolocationService {
           geometry: location.geometry,
         };
       });
-      return suggestionsFromSearch
+      return suggestionsFromSearch;
     } catch (err) {
-      logger.logErrorWithoutRequest(err)
-      throw err
+      logger.logErrorWithoutRequest(err);
+      throw err;
     }
   }
 
@@ -44,12 +44,12 @@ class GeolocationService {
           geometry: location.geometry,
         };
       });
-      return features
+      return features;
     } catch (err) {
-      logger.logErrorWithoutRequest(err)
-      throw err
+      logger.logErrorWithoutRequest(err);
+      throw err;
     }
   }
 }
 
-module.exports = GeolocationService
+module.exports = GeolocationService;

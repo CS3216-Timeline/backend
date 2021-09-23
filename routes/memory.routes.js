@@ -23,7 +23,7 @@ const logger = require("../middleware/logger");
 router.post(
   "/",
   auth,
-  upload.array("images", process.env.MAX_MEDIA_PER_MEMORY),
+  upload.array("images", parseInt(process.env.MAX_MEDIA_PER_MEMORY)),
   [
     check("title", "Title of memory cannot be blank").notEmpty(),
     check("line", "Line cannot be blank").exists(),

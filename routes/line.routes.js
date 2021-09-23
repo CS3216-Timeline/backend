@@ -75,7 +75,7 @@ router.get("/:lineId", auth, async (req, res, next) => {
           userId,
           lineId
         );
-      if (!lineWithMemories) {
+      if (lineWithMemories.length === 0) {
         throw new NotFoundError("Line does not exist");
       }
       line.lineId = lineWithMemories[0].lineId;

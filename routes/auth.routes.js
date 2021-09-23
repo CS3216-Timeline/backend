@@ -20,7 +20,7 @@ function generateAccessToken(userId, res) {
     {},
     process.env.JWT_SECRET,
     {
-      expiresIn: process.env.JWT_EXPIRY_SECONDS,
+      expiresIn: parseInt(process.env.JWT_EXPIRY_SECONDS),
       subject: userId.toString(),
     },
     (err, token) => {
