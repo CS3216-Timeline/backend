@@ -7,7 +7,7 @@ const logger = require("../middleware/logger");
 
 const multer = require("multer");
 const {
-  checkIfMemoryIfValidUserMemory,
+  checkIfMemoryIsValidUserMemory,
   checkIfMediaIsValidUserMedia,
 } = require("../services/util");
 const StorageService = require("../services/StorageService");
@@ -36,7 +36,7 @@ router.post(
       const { userId } = req.user;
       const { memoryId } = req.body;
 
-      if (!(await checkIfMemoryIfValidUserMemory(memoryId, userId))) {
+      if (!(await checkIfMemoryIsValidUserMemory(memoryId, userId))) {
         throw new NotFoundError("Memory not found");
       }
 
@@ -157,7 +157,7 @@ router.post(
       const { userId } = req.user;
       const { memoryId, updates } = req.body;
 
-      if (!(await checkIfMemoryIfValidUserMemory(memoryId, userId))) {
+      if (!(await checkIfMemoryIsValidUserMemory(memoryId, userId))) {
         throw new NotFoundError("Memory not found");
       }
 

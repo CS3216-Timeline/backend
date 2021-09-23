@@ -14,7 +14,7 @@ const MediaService = require("../services/MediaService");
 const mediaService = new MediaService();
 const {
   checkIfUserIsLineOwner,
-  checkIfMemoryIfValidUserMemory,
+  checkIfMemoryIsValidUserMemory,
   isValidDate,
 } = require("../services/util");
 const upload = multer();
@@ -134,7 +134,7 @@ router.get("/:memoryId", auth, async (req, res, next) => {
     const { userId } = req.user;
     const { memoryId } = req.params;
 
-    if (!(await checkIfMemoryIfValidUserMemory(memoryId, userId))) {
+    if (!(await checkIfMemoryIsValidUserMemory(memoryId, userId))) {
       throw new NotFoundError("Memory not found");
     }
 
@@ -155,7 +155,7 @@ router.delete("/:memoryId", auth, async (req, res, next) => {
     const { userId } = req.user;
     const { memoryId } = req.params;
 
-    if (!(await checkIfMemoryIfValidUserMemory(memoryId, userId))) {
+    if (!(await checkIfMemoryIsValidUserMemory(memoryId, userId))) {
       throw new NotFoundError("Memory not found");
     }
 
@@ -209,7 +209,7 @@ router.patch(
       const { memoryId } = req.params;
       const { title, line, description, latitude, longitude } = req.body;
 
-      if (!(await checkIfMemoryIfValidUserMemory(memoryId, userId))) {
+      if (!(await checkIfMemoryIsValidUserMemory(memoryId, userId))) {
         throw new NotFoundError("Memory not found");
       }
 
