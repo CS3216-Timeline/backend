@@ -77,7 +77,7 @@ class UserService {
     let hashedPassword = null;
     if (password != null) {
       // hash the password
-      const salt = await bcrypt.genSalt(process.env.BCRYPT_SALT_LEN);
+      const salt = await bcrypt.genSalt(parseInt(process.env.BCRYPT_SALT_LEN));
       hashedPassword = await bcrypt.hash(password, salt);
     }
 
