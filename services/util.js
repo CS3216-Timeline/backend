@@ -17,6 +17,9 @@ async function checkIfMediaExists(mediaId) {
 
 async function checkIfUserIsMediaOwner(userId, mediaId) {
   const media = await mediaService.getMediaByMediaId(mediaId);
+  if (!media) {
+    return false;
+  }
   const memoryId = media["memoryId"];
   return checkIfUserIsMemoryOwner(userId, memoryId);
 }
@@ -24,6 +27,10 @@ async function checkIfUserIsMediaOwner(userId, mediaId) {
 async function checkIfUserIsMemoryOwner(userId, memoryId) {
   const memory = await memoryService.getMemoryByMemoryId(memoryId);
   const userLines = await lineService.getAllLinesByUserId(userId);
+  if (!memory) {
+    return false;
+  }
+
   memoryLineId = memory["lineId"];
 
   for (var i = 0; i < userLines.length; i += 1) {
@@ -37,6 +44,9 @@ async function checkIfUserIsMemoryOwner(userId, memoryId) {
 
 async function checkIfUserIsLineOwner(userId, lineId) {
   const line = await lineService.getLineByLineId(lineId);
+  if (!line) {
+    return false;
+  }
   return line["userId"] === userId;
 }
 
@@ -47,13 +57,21 @@ async function numberOfMediaInMemory(memoryId) {
 
 async function checkIfMemoryIsValidUserMemory(memoryId, userId) {
   const memoryInfo = await memoryService.getMemoryWithLineInformation(memoryId);
+  if (!memoryInfo) {
+    return false;
+  }
   return memoryInfo["userId"] === userId;
 }
 
 async function checkIfMediaIsValidUserMedia(mediaId, userId) {
-    const mediaInfo = await mediaService.getMediaWithMemoryAndLineInformation(mediaId);
-    return mediaInfo["userId"] === userId;
+  const mediaInfo = await mediaService.getMediaWithMemoryAndLineInformation(
+    mediaId
+  );
+  if (!mediaInfo) {
+    return false;
   }
+  return mediaInfo["userId"] === userId;
+}
 
 function isValidDate(year, month, day) {
   date = new Date(`${year}/${month}/${day}`);
@@ -69,5 +87,5 @@ module.exports = {
   isValidDate,
   checkIfMemoryIsValidUserMemory,
   numberOfMediaInMemory,
-  checkIfMediaIsValidUserMedia
+  checkIfMediaIsValidUserMedia,
 };
