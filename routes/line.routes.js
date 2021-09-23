@@ -1,7 +1,11 @@
 const express = require("express");
 const router = express.Router();
 const { check, oneOf, validationResult } = require("express-validator");
-const { BadRequestError, UnauthorizedError } = require("../errors/errors");
+const {
+  BadRequestError,
+  UnauthorizedError,
+  NotFoundError,
+} = require("../errors/errors");
 const auth = require("../middleware/auth");
 const LineService = require("../services/LineService");
 const lineService = new LineService();
@@ -71,6 +75,9 @@ router.get("/:lineId", auth, async (req, res, next) => {
           userId,
           lineId
         );
+      if (!lineWithMemories) {
+        throw new NotFoundError("Line does not exist");
+      }
       line.lineId = lineWithMemories[0].lineId;
       line.userId = lineWithMemories[0].userId;
       line.name = lineWithMemories[0].name;
@@ -94,6 +101,9 @@ router.get("/:lineId", auth, async (req, res, next) => {
       }
     } else {
       line = await lineService.getLineByLineId(userId, lineId);
+      if (!line) {
+        throw new NotFoundError("Line does not exist");
+      }
     }
 
     res.status(200).json({
@@ -137,6 +147,10 @@ router.patch(
         colorHex
       );
 
+      if (!line) {
+        throw new NotFoundError("Line does not exist");
+      }
+
       res.status(200).json({
         line,
       });
@@ -152,6 +166,10 @@ router.delete("/:lineId", auth, async (req, res, next) => {
     const { userId } = req.user;
     const { lineId } = req.params;
     const line = await lineService.deleteLineByLineId(lineId, userId);
+
+    if (!line) {
+      throw new NotFoundError("Line does not exist");
+    }
 
     res.status(200).json({
       line,

@@ -160,12 +160,18 @@ router.delete("/:memoryId", auth, async (req, res, next) => {
     }
 
     const deletedMedia = await mediaService.deleteMediaByMemory(memoryId);
+    if (!deletedMedia) {
+      throw new NotFoundError("Memory not found");
+    }
     for (let i = 0; i < deletedMedia.length; i++) {
       const url = deletedMedia[i]["url"];
       await storageService.deleteImage(url);
     }
 
     const deletedMemory = await memoryService.deleteMemoryById(memoryId);
+    if (!deletedMemory) {
+      throw new NotFoundError("Memory not found");
+    }
     deletedMemory["media"] = deletedMedia;
     res.status(200).json({
       memory: deletedMemory,

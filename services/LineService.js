@@ -1,7 +1,5 @@
 const pool = require("../db/db");
 const camelizeKeys = require("../db/utils");
-const { snakeCase } = require("lodash");
-const { NotFoundError } = require("../errors/errors");
 const logger = require("../middleware/logger");
 
 class LineService {
@@ -26,9 +24,6 @@ class LineService {
         "SELECT * FROM lines WHERE line_id = $1 AND user_id = $2",
         [lineId, userId]
       );
-      if (!lines.rows[0]) {
-        throw new NotFoundError("Line does not exist");
-      }
       return camelizeKeys(lines.rows[0]);
     } catch (err) {
       logger.logErrorWithoutRequest(err);
@@ -58,9 +53,6 @@ class LineService {
         WHERE L.line_id = $1 AND L.user_id = $2 ORDER BY M.creation_date DESC`,
         [lineId, userId]
       );
-      if (!lineWithMemories.rows[0]) {
-        throw new NotFoundError("Line does not exist");
-      }
       return camelizeKeys(lineWithMemories.rows);
     } catch (err) {
       logger.logErrorWithoutRequest(err);
@@ -97,11 +89,6 @@ class LineService {
         WHERE line_id = $3 AND user_id = $4 RETURNING *`,
         [name, colorHex, lineId, userId]
       );
-      if (!updatedLine.rows[0]) {
-        throw new NotFoundError(
-          "Line does not exist for the user, cannot update"
-        );
-      }
       return camelizeKeys(updatedLine.rows[0]);
     } catch (err) {
       logger.logErrorWithoutRequest(err);
@@ -115,11 +102,6 @@ class LineService {
         "DELETE FROM lines WHERE line_id = $1 AND user_id = $2 RETURNING *",
         [lineId, userId]
       );
-      if (!deletedLine.rows[0]) {
-        throw new NotFoundError(
-          "Line does not exist for the user, cannot delete"
-        );
-      }
       return camelizeKeys(deletedLine.rows[0]);
     } catch (err) {
       logger.logErrorWithoutRequest(err);
