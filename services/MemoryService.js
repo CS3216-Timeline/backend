@@ -1,6 +1,5 @@
 const pool = require("../db/db");
 const camelizeKeys = require("../db/utils");
-const { NotFoundError } = require("../errors/errors");
 const logger = require("../middleware/logger");
 
 class MemoryService {
@@ -80,9 +79,6 @@ class MemoryService {
         "DELETE FROM memories WHERE memory_id = $1 RETURNING *",
         [memoryId]
       );
-      if (!deletedMemory.rows[0]) {
-        throw new NotFoundError("Memory does not exist, cannot delete");
-      }
       return camelizeKeys(deletedMemory.rows[0]);
     } catch (err) {
       logger.logErrorWithoutRequest(err);

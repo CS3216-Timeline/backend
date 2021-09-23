@@ -1,7 +1,6 @@
 const pool = require("../db/db");
 const camelizeKeys = require("../db/utils");
-const { NotFoundError, BadRequestError } = require("../errors/errors");
-const StorageService = require("./StorageService");
+const { BadRequestError } = require("../errors/errors");
 const logger = require("../middleware/logger");
 
 class MediaService {
@@ -52,9 +51,6 @@ class MediaService {
         "DELETE FROM media WHERE media_id = $1 RETURNING *",
         [mediaId]
       );
-      if (!deletedMedia.rows[0]) {
-        throw new NotFoundError("Media does not exist, cannot delete");
-      }
       return camelizeKeys(deletedMedia.rows[0]);
     } catch (err) {
       logger.logErrorWithoutRequest(err);
@@ -68,9 +64,6 @@ class MediaService {
         "DELETE FROM media WHERE memory_id = $1 RETURNING *",
         [memoryId]
       );
-      if (!deletedMedia.rows[0]) {
-        throw new NotFoundError("Memory does not exist, cannot delete");
-      }
       return camelizeKeys(deletedMedia.rows);
     } catch (err) {
       logger.logErrorWithoutRequest(err);

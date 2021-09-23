@@ -1,6 +1,5 @@
 const { Strategy: JwtStrategy, ExtractJwt } = require("passport-jwt");
 const FacebookTokenStrategy = require("passport-facebook-token");
-const config = require("config");
 const UserService = require("../services/UserService");
 const logger = require("../middleware/logger");
 require("dotenv").config();
@@ -8,7 +7,7 @@ require("dotenv").config();
 const userService = new UserService();
 
 const jwtOptions = {
-  secretOrKey: config.get("jwtSecret"),
+  secretOrKey: process.env.JWT_SECRET,
   jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
 };
 

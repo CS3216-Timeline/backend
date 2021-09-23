@@ -77,7 +77,7 @@ router.get("/:mediaId", auth, async (req, res, next) => {
     const { mediaId } = req.params;
 
     if (!(await checkIfMediaIsValidUserMedia(mediaId, userId))) {
-        throw new NotFoundError("Media does not exist");
+      throw new NotFoundError("Media does not exist");
     }
 
     const media = await mediaService.getMediaByMediaId(mediaId);
@@ -97,10 +97,13 @@ router.delete("/:mediaId", auth, async (req, res, next) => {
     const { mediaId } = req.params;
 
     if (!(await checkIfMediaIsValidUserMedia(mediaId, userId))) {
-        throw new NotFoundError("Media does not exist");
+      throw new NotFoundError("Media does not exist");
     }
 
     const deletedMedia = await mediaService.deleteMediaById(mediaId);
+    if (!deletedMedia) {
+      throw new NotFoundError("Memory does not exist");
+    }
     const memoryId = deletedMedia["memoryId"];
     const remainingMedia = await mediaService.getAllMediaByMemory(memoryId);
     let updates = [];
