@@ -34,16 +34,6 @@ function generateAccessToken(userId, res) {
   );
 }
 
-router.get("/", auth, async (req, res, next) => {
-  try {
-    const user = await userService.findUserById(req.user.userId);
-    res.json(user);
-  } catch (err) {
-    logger.logError(req, err);
-    next(err);
-  }
-});
-
 router.post(
   "/register",
   [
