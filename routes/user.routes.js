@@ -41,8 +41,10 @@ router.patch(
         name,
         picture,
         null
-      ); // TODO: upload picture and get url
-
+      );
+      if (!user) {
+        throw new NotFoundError("User does not exist");
+      }
       res.status(200).json({
         user,
       });
@@ -103,6 +105,9 @@ router.post(
         null,
         newPassword
       );
+      if (!user) {
+        throw new NotFoundError("User does not exist");
+      }
       res.status(200).end();
     } catch (err) {
       logger.logError(req, err);
