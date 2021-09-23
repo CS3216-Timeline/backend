@@ -21,7 +21,7 @@ function generateAccessToken(userId, res) {
     {},
     config.get("jwtSecret"),
     {
-      expiresIn: 360000,
+      expiresIn: process.env.JWT_EXPIRY_SECONDS,
       subject: userId.toString(),
     },
     (err, token) => {
