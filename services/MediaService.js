@@ -23,7 +23,7 @@ class MediaService {
   async getAllMediaByMemory(memoryId) {
     try {
       const media = await pool.query(
-        "SELECT * FROM media WHERE memory_id = $1",
+        "SELECT * FROM media WHERE memory_id = $1 ORDER BY position",
         [memoryId]
       );
       return camelizeKeys(media.rows);
@@ -36,7 +36,7 @@ class MediaService {
   async getMediaByMediaId(mediaId) {
     try {
       const media = await pool.query(
-        "SELECT * FROM media WHERE media_id = $1",
+        "SELECT * FROM media WHERE media_id = $1 ORDER BY position",
         [mediaId]
       );
       return camelizeKeys(media.rows[0]);
