@@ -1,7 +1,7 @@
 const pool = require("../db/db");
 const camelizeKeys = require("../db/utils");
 const { NotFoundError } = require("../errors/errors");
-const logger = require("../middleware/logger")
+const logger = require("../middleware/logger");
 
 class MemoryService {
   constructor() {}
@@ -14,7 +14,7 @@ class MemoryService {
       );
       return camelizeKeys(newMemory.rows[0]);
     } catch (err) {
-      logger.logErrorWithoutRequest(err)
+      logger.logErrorWithoutRequest(err);
       throw err;
     }
   }
@@ -43,7 +43,7 @@ class MemoryService {
       );
       return camelizeKeys(updatedMemory.rows[0]);
     } catch (err) {
-      logger.logErrorWithoutRequest(err)
+      logger.logErrorWithoutRequest(err);
       throw err;
     }
   }
@@ -56,7 +56,7 @@ class MemoryService {
       );
       return camelizeKeys(memories.rows);
     } catch (err) {
-      logger.logErrorWithoutRequest(err)
+      logger.logErrorWithoutRequest(err);
       throw err;
     }
   }
@@ -69,7 +69,7 @@ class MemoryService {
       );
       return camelizeKeys(memories.rows[0]);
     } catch (err) {
-      logger.logErrorWithoutRequest(err)
+      logger.logErrorWithoutRequest(err);
       throw err;
     }
   }
@@ -85,7 +85,23 @@ class MemoryService {
       }
       return camelizeKeys(deletedMemory.rows[0]);
     } catch (err) {
-      logger.logErrorWithoutRequest(err)
+      logger.logErrorWithoutRequest(err);
+      throw err;
+    }
+  }
+
+  async getMemoryWithLineInformation(memoryId) {
+    try {
+      const memories = await pool.query(
+        `SELECT * FROM MEMORIES NATURAL JOIN LINES WHERE memory_id = $1`,
+        [memoryId]
+      );
+      if (memories.rows.length === 0) {
+        return {};
+      }
+      return camelizeKeys(memories.rows);
+    } catch (err) {
+      logger.logErrorWithoutRequest(err);
       throw err;
     }
   }
@@ -103,7 +119,7 @@ class MemoryService {
       );
       return camelizeKeys(numberOfMemories.rows);
     } catch (err) {
-      logger.logErrorWithoutRequest(err)
+      logger.logErrorWithoutRequest(err);
       throw err;
     }
   }
@@ -123,7 +139,7 @@ class MemoryService {
       );
       return camelizeKeys(memories.rows);
     } catch (err) {
-      logger.logErrorWithoutRequest(err)
+      logger.logErrorWithoutRequest(err);
       throw err;
     }
   }

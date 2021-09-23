@@ -2,7 +2,7 @@ const pool = require("../db/db");
 const camelizeKeys = require("../db/utils");
 const { NotFoundError, BadRequestError } = require("../errors/errors");
 const StorageService = require("./StorageService");
-const logger = require("../middleware/logger")
+const logger = require("../middleware/logger");
 
 class MediaService {
   constructor() {}
@@ -15,7 +15,7 @@ class MediaService {
       );
       return camelizeKeys(newMedia.rows[0]);
     } catch (err) {
-      logger.logErrorWithoutRequest(err)
+      logger.logErrorWithoutRequest(err);
       throw err;
     }
   }
@@ -28,7 +28,7 @@ class MediaService {
       );
       return camelizeKeys(media.rows);
     } catch (err) {
-      logger.logErrorWithoutRequest(err)
+      logger.logErrorWithoutRequest(err);
       throw err;
     }
   }
@@ -41,7 +41,7 @@ class MediaService {
       );
       return camelizeKeys(media.rows[0]);
     } catch (err) {
-      logger.logErrorWithoutRequest(err)
+      logger.logErrorWithoutRequest(err);
       throw err;
     }
   }
@@ -57,7 +57,7 @@ class MediaService {
       }
       return camelizeKeys(deletedMedia.rows[0]);
     } catch (err) {
-      logger.logErrorWithoutRequest(err)
+      logger.logErrorWithoutRequest(err);
       throw err;
     }
   }
@@ -73,7 +73,23 @@ class MediaService {
       }
       return camelizeKeys(deletedMedia.rows);
     } catch (err) {
-      logger.logErrorWithoutRequest(err)
+      logger.logErrorWithoutRequest(err);
+      throw err;
+    }
+  }
+
+  async getMediaWithMemoryAndLineInformation(mediaId) {
+    try {
+      const media = await pool.query(
+        `SELECT * FROM MEDIA NATURAL JOIN MEMORIES NATURAL JOIN LINES WHERE media_id = $1`,
+        [mediaId]
+      );
+      if (media.rows.length === 0) {
+        return {};
+      }
+      return camelizeKeys(media.rows);
+    } catch (err) {
+      logger.logErrorWithoutRequest(err);
       throw err;
     }
   }
@@ -91,7 +107,7 @@ class MediaService {
       }
       await pool.query("COMMIT");
     } catch (err) {
-      logger.logErrorWithoutRequest(err)
+      logger.logErrorWithoutRequest(err);
       await pool.query("ROLLBACK");
       throw new BadRequestError("Invalid positioning");
     }

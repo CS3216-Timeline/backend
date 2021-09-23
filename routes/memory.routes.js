@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const { check, oneOf, validationResult } = require("express-validator");
-const { BadRequestError, UnauthorizedError } = require("../errors/errors");
+const { BadRequestError, NotFoundError } = require("../errors/errors");
 const auth = require("../middleware/auth");
 const MemoryService = require("../services/MemoryService");
 const memoryService = new MemoryService();
@@ -13,9 +13,8 @@ const storageService = new StorageService();
 const MediaService = require("../services/MediaService");
 const mediaService = new MediaService();
 const {
-  checkIfMemoryExists,
   checkIfUserIsLineOwner,
-  checkIfUserIsMemoryOwner,
+  checkIfMemoryIfValidUserMemory,
   isValidDate,
 } = require("../services/util");
 const upload = multer();
@@ -47,7 +46,7 @@ router.post(
       const { title, line, description, latitude, longitude } = req.body;
 
       if (!(await checkIfUserIsLineOwner(userId, line))) {
-        throw new UnauthorizedError("Line does not belong to this user");
+        throw new NotFoundError("Line not found");
       }
 
       const memory = await memoryService.createMemory(
@@ -134,12 +133,9 @@ router.get("/:memoryId", auth, async (req, res, next) => {
   try {
     const { userId } = req.user;
     const { memoryId } = req.params;
-    if (!(await checkIfMemoryExists(memoryId))) {
-      throw new BadRequestError("Memory does not exist");
-    }
 
-    if (!(await checkIfUserIsMemoryOwner(userId, memoryId))) {
-      throw new UnauthorizedError("Memory does not belong to this user");
+    if (!(await checkIfMemoryIfValidUserMemory(memoryId, userId))) {
+      throw new NotFoundError("Memory not found");
     }
 
     const memory = await memoryService.getMemoryByMemoryId(memoryId);
@@ -159,12 +155,8 @@ router.delete("/:memoryId", auth, async (req, res, next) => {
     const { userId } = req.user;
     const { memoryId } = req.params;
 
-    if (!(await checkIfMemoryExists(memoryId))) {
-      throw new BadRequestError("Memory does not exist");
-    }
-
-    if (!(await checkIfUserIsMemoryOwner(userId, memoryId))) {
-      throw new UnauthorizedError("Memory does not belong to this user");
+    if (!(await checkIfMemoryIfValidUserMemory(memoryId, userId))) {
+      throw new NotFoundError("Memory not found");
     }
 
     const deletedMedia = await mediaService.deleteMediaByMemory(memoryId);
@@ -214,12 +206,8 @@ router.patch(
       const { memoryId } = req.params;
       const { title, line, description, latitude, longitude } = req.body;
 
-      if (!(await checkIfMemoryExists(memoryId))) {
-        throw new BadRequestError("Memory does not exist");
-      }
-
-      if (!(await checkIfUserIsMemoryOwner(userId, memoryId))) {
-        throw new UnauthorizedError("Memory does not belong to this user");
+      if (!(await checkIfMemoryIfValidUserMemory(memoryId, userId))) {
+        throw new NotFoundError("Memory not found");
       }
 
       const memory = await memoryService.updateMemory(

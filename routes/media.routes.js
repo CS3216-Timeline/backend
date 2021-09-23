@@ -1,18 +1,14 @@
 const express = require("express");
 const router = express.Router();
-const { check, oneOf, validationResult } = require("express-validator");
-const { BadRequestError, UnauthorizedError } = require("../errors/errors");
+const { check, validationResult } = require("express-validator");
+const { BadRequestError, NotFoundError } = require("../errors/errors");
 const auth = require("../middleware/auth");
-const MemoryService = require("../services/MemoryService");
-const memoryService = new MemoryService();
 const logger = require("../middleware/logger");
 
 const multer = require("multer");
 const {
-  checkIfMemoryExists,
-  checkIfMediaExists,
-  checkIfUserIsMediaOwner,
-  checkIfUserIsMemoryOwner,
+  checkIfMemoryIfValidUserMemory,
+  checkIfMediaIsValidUserMedia,
 } = require("../services/util");
 const StorageService = require("../services/StorageService");
 const storageService = new StorageService();
@@ -40,19 +36,21 @@ router.post(
       const { userId } = req.user;
       const { memoryId } = req.body;
 
-      if (!(await checkIfUserIsMemoryOwner(userId, memoryId))) {
-        throw new UnauthorizedError("Memory does not belong to this user");
+      if (!(await checkIfMemoryIfValidUserMemory(memoryId, userId))) {
+        throw new NotFoundError("Memory not found");
       }
 
       let curMedia = await mediaService.getAllMediaByMemory(memoryId);
       const images = req.files;
       const initialLength = curMedia.length;
-      const addedLength = images.length
+      const addedLength = images.length;
 
       if (initialLength + addedLength > process.env.MAX_MEDIA_PER_MEMORY) {
-        throw new BadRequestError("Exceeded maximum number of media for this memory");
+        throw new BadRequestError(
+          "Exceeded maximum number of media for this memory"
+        );
       }
-      
+
       for (let i = 0; i < addedLength; i++) {
         const url = await storageService.uploadImage(images[i]);
         const newMedia = await mediaService.createMedia(
@@ -78,12 +76,8 @@ router.get("/:mediaId", auth, async (req, res, next) => {
     const { userId } = req.user;
     const { mediaId } = req.params;
 
-    if (!(await checkIfMediaExists(mediaId))) {
-      throw new BadRequestError("Media does not exist");
-    }
-
-    if (!(await checkIfUserIsMediaOwner(userId, mediaId))) {
-      throw new UnauthorizedError("Media does not belong to this user");
+    if (!(await checkIfMediaIsValidUserMedia(mediaId, userId))) {
+        throw new NotFoundError("Media does not exist");
     }
 
     const media = await mediaService.getMediaByMediaId(mediaId);
@@ -102,12 +96,8 @@ router.delete("/:mediaId", auth, async (req, res, next) => {
     const { userId } = req.user;
     const { mediaId } = req.params;
 
-    if (!(await checkIfMediaExists(mediaId))) {
-      throw new BadRequestError("Media does not exist");
-    }
-
-    if (!(await checkIfUserIsMediaOwner(userId, mediaId))) {
-      throw new UnauthorizedError("Media does not belong to this user");
+    if (!(await checkIfMediaIsValidUserMedia(mediaId, userId))) {
+        throw new NotFoundError("Media does not exist");
     }
 
     const deletedMedia = await mediaService.deleteMediaById(mediaId);
@@ -141,7 +131,11 @@ router.delete("/:mediaId", auth, async (req, res, next) => {
 router.post(
   "/positions",
   auth,
-  [check("updates", "At least one position needs to be updated").isArray({min: 1})],
+  [
+    check("updates", "At least one position needs to be updated").isArray({
+      min: 1,
+    }),
+  ],
   async (req, res, next) => {
     try {
       const errors = validationResult(req);
@@ -157,12 +151,8 @@ router.post(
       const { userId } = req.user;
       const { memoryId, updates } = req.body;
 
-      if (!(await checkIfMemoryExists(memoryId))) {
-        throw new BadRequestError("Memory does not exist");
-      }
-
-      if (!(await checkIfUserIsMemoryOwner(userId, memoryId))) {
-        throw new UnauthorizedError("Memory does not belong to this user");
+      if (!(await checkIfMemoryIfValidUserMemory(memoryId, userId))) {
+        throw new NotFoundError("Memory not found");
       }
 
       await mediaService.updatePositions(updates);
