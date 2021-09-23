@@ -40,6 +40,11 @@ async function checkIfUserIsLineOwner(userId, lineId) {
   return line["userId"] === userId;
 }
 
+async function numberOfMediaInMemory(memoryId) {
+    const media = await mediaService.getAllMediaByMemory(memoryId)
+    return media.length
+}
+
 function isValidDate(year, month, day) {
   date = new Date(`${year}/${month}/${day}`);
   return date instanceof Date && !isNaN(date);

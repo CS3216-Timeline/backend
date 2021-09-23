@@ -19,7 +19,7 @@ class UserService {
       let hashedPassword = null;
       if (password !== null) {
         // hash the password
-        const salt = await bcrypt.genSalt(10);
+        const salt = await bcrypt.genSalt(process.env.BCRYPT_SALT_LEN);
         hashedPassword = await bcrypt.hash(password, salt);
       }
       newUser = await pool.query(
@@ -75,7 +75,7 @@ class UserService {
     let hashedPassword = null;
     if (password != null) {
       // hash the password
-      const salt = await bcrypt.genSalt(10);
+      const salt = await bcrypt.genSalt(process.env.BCRYPT_SALT_LEN);
       hashedPassword = await bcrypt.hash(password, salt);
     }
 

@@ -1,6 +1,7 @@
 const axios = require("axios")
 require("dotenv").config();
 const mapboxApiKey = process.env.MAPBOX_APP_SECRET
+const mapboxResultLimit = process.env.MAPBOX_RESULT_LIMIT
 const logger = require("../middleware/logger")
 
 const STARTING_URL = "https://api.mapbox.com/geocoding/v5/mapbox.places/";
@@ -13,7 +14,7 @@ class GeolocationService {
       let url = new URL(`${STARTING_URL}${searchText}.json`);
       url.searchParams.append("worldview", "cn");
       url.searchParams.append("access_token", mapboxApiKey);
-      url.searchParams.append("limit", 10);
+      url.searchParams.append("limit", mapboxResultLimit);
       if (longitude && latitude) {
         url.searchParams.append("proximity", `${longitude},${latitude}`);
       }

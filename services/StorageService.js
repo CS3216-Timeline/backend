@@ -47,7 +47,6 @@ class StorageService {
   }
 
   generateUUID() {
-    // TODO: check if uuid is somehow already used
     return uuidv4();
   }
 
