@@ -47,7 +47,8 @@ async function checkIfUserIsLineOwner(userId, lineId) {
   if (!line) {
     return false;
   }
-  return line["userId"] === userId;
+  
+  return line.userId === userId;
 }
 
 async function numberOfMediaInMemory(memoryId) {
@@ -60,7 +61,7 @@ async function checkIfMemoryIsValidUserMemory(memoryId, userId) {
   if (!memoryInfo) {
     return false;
   }
-  return memoryInfo["userId"] === userId;
+  return memoryInfo[0].userId === userId;
 }
 
 async function checkIfMediaIsValidUserMedia(mediaId, userId) {
@@ -70,7 +71,7 @@ async function checkIfMediaIsValidUserMedia(mediaId, userId) {
   if (!mediaInfo) {
     return false;
   }
-  return mediaInfo["userId"] === userId;
+  return mediaInfo[0].userId === userId;
 }
 
 function isValidDate(year, month, day) {
