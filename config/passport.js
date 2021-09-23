@@ -2,6 +2,7 @@ const { Strategy: JwtStrategy, ExtractJwt } = require("passport-jwt");
 const FacebookTokenStrategy = require("passport-facebook-token");
 const config = require("config");
 const UserService = require("../services/UserService");
+const logger = require("../middleware/logger");
 require("dotenv").config();
 
 const userService = new UserService();
@@ -15,13 +16,12 @@ const jwtVerify = async (payload, done) => {
   try {
     const user = await userService.findUserById(parseInt(payload.sub));
     if (!user) {
-      console.log("Request: User not found.");
+      logger.logInfo(req, "user not verified");
       return done(null, false);
     }
-    console.log("Request: User verified.");
     done(null, user);
   } catch (error) {
-    console.log("Request: Verification error.");
+    logger.logError(req, err);
     done(error);
   }
 };

@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const GeolocationService = require('../services/GeolocationService');
 const auth = require("../middleware/auth");
-
+const logger = require("../middleware/logger")
 const geolocationService = new GeolocationService();
 
 router.get("/locations", auth, async (req, res, next) => {
@@ -17,6 +17,7 @@ router.get("/locations", auth, async (req, res, next) => {
       suggestions
     })
   } catch (err) {
+    logger.logError(req, err)
     next(err);
   }
 });
@@ -32,6 +33,7 @@ router.get("/features", auth, async (req, res, next) => {
       features
     })
   } catch (err) {
+    logger.logError(req, err)
     next(err);
   }
 });

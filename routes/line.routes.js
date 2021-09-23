@@ -5,6 +5,7 @@ const { BadRequestError, UnauthorizedError } = require("../errors/errors");
 const auth = require("../middleware/auth");
 const LineService = require("../services/LineService");
 const lineService = new LineService();
+const logger = require("../middleware/logger");
 
 // TODO: Check whether we should return sorted or unsorted response
 // Can potentially have a query parameter for them to choose
@@ -19,6 +20,7 @@ router.get("/", auth, async (req, res, next) => {
       lines,
     });
   } catch (err) {
+    logger.logError(req, err);
     next(err);
   }
 });
@@ -51,6 +53,7 @@ router.post(
         line,
       });
     } catch (err) {
+      logger.logError(req, err);
       next(err);
     }
   }
@@ -74,7 +77,6 @@ router.get("/:lineId", auth, async (req, res, next) => {
       line.memories = [];
       for (let memory of lineWithMemories) {
         if (memory.memoryId == null) {
-          console.log("No memories");
           break;
         }
         line.memories.push({
@@ -100,6 +102,7 @@ router.get("/:lineId", auth, async (req, res, next) => {
       throw new UnauthorizedError("You do not have access to this line");
     }
   } catch (err) {
+    logger.logError(req, err);
     next(err);
   }
 });
@@ -140,6 +143,7 @@ router.patch(
         line,
       });
     } catch (err) {
+      logger.logError(req, err);
       next(err);
     }
   }
@@ -155,6 +159,7 @@ router.delete("/:lineId", auth, async (req, res, next) => {
       line,
     });
   } catch (err) {
+    logger.logError(req, err);
     next(err);
   }
 });

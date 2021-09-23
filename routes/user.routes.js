@@ -13,6 +13,7 @@ const minPasswordLength = 5;
 
 const UserService = require("../services/UserService");
 const userService = new UserService();
+const logger = require("../middleware/logger");
 
 router.patch(
   "/profile",
@@ -46,6 +47,7 @@ router.patch(
         user,
       });
     } catch (err) {
+      logger.logError(req, err);
       next(err);
     }
   }
@@ -103,6 +105,7 @@ router.post(
       );
       res.status(200).end();
     } catch (err) {
+      logger.logError(req, err);
       next(err);
     }
   }
@@ -114,6 +117,7 @@ router.delete("/delete", auth, async (req, res, next) => {
     const user = await userService.deleteUserByUserId(userId);
     res.status(200).end();
   } catch (err) {
+    logger.logError(req, err);
     next(err);
   }
 });

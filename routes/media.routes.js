@@ -5,6 +5,7 @@ const { BadRequestError, UnauthorizedError } = require("../errors/errors");
 const auth = require("../middleware/auth");
 const MemoryService = require("../services/MemoryService");
 const memoryService = new MemoryService();
+const logger = require("../middleware/logger");
 
 const multer = require("multer");
 const {
@@ -44,21 +45,23 @@ router.post(
       }
 
       let curMedia = await mediaService.getAllMediaByMemory(memoryId);
+      const offset = curMedia.length;
       const images = req.files;
       for (let i = 0; i < images.length; i++) {
         const url = await storageService.uploadImage(images[i]);
-        const newMedia = mediaService.createMedia(
+        const newMedia = await mediaService.createMedia(
           url,
           memoryId,
-          images.length + i
+          offset + i
         );
         curMedia.push(newMedia);
       }
 
       res.status(200).json({
-        media,
+        media: curMedia,
       });
     } catch (err) {
+      logger.logError(req, err);
       next(err);
     }
   }
@@ -77,12 +80,13 @@ router.get("/:mediaId", auth, async (req, res, next) => {
       throw new UnauthorizedError("Media does not belong to this user");
     }
 
-    const media = await mediaId.getMediaByMediaId(mediaId);
+    const media = await mediaService.getMediaByMediaId(mediaId);
 
     res.status(200).json({
       media,
     });
   } catch (err) {
+    logger.logError(req, err);
     next(err);
   }
 });
@@ -121,9 +125,10 @@ router.delete("/:mediaId", auth, async (req, res, next) => {
     await mediaService.updatePositions(updates);
 
     res.status(200).json({
-      memory: deletedMedia,
+      media: deletedMedia,
     });
   } catch (err) {
+    logger.logError(req, err);
     next(err);
   }
 });
@@ -162,6 +167,7 @@ router.post(
         updates: updates,
       });
     } catch (err) {
+      logger.logError(req, err);
       next(err);
     }
   }

@@ -2,6 +2,7 @@ const pool = require("../db/db");
 const camelizeKeys = require("../db/utils");
 const { snakeCase } = require("lodash");
 const { NotFoundError } = require("../errors/errors");
+const logger = require("../middleware/logger")
 
 class LineService {
   constructor() {}
@@ -14,6 +15,7 @@ class LineService {
       );
       return camelizeKeys(newLine.rows[0]);
     } catch (err) {
+      logger.logErrorWithoutRequest(err)
       throw err;
     }
   }
@@ -28,6 +30,7 @@ class LineService {
       }
       return camelizeKeys(lines.rows[0]);
     } catch (err) {
+      logger.logErrorWithoutRequest(err)
       throw err;
     }
   }
@@ -39,6 +42,7 @@ class LineService {
       ]);
       return camelizeKeys(lines.rows);
     } catch (err) {
+      logger.logErrorWithoutRequest(err)
       throw err;
     }
   }
@@ -58,6 +62,7 @@ class LineService {
       }
       return camelizeKeys(lineWithMemories.rows);
     } catch (err) {
+      logger.logErrorWithoutRequest(err)
       throw err;
     }
   }
@@ -79,6 +84,7 @@ class LineService {
       );
       return camelizeKeys(lines.rows);
     } catch (err) {
+      logger.logErrorWithoutRequest(err)
       throw err;
     }
   }
@@ -97,6 +103,7 @@ class LineService {
       }
       return camelizeKeys(updatedLine.rows[0]);
     } catch (err) {
+      logger.logErrorWithoutRequest(err)
       throw err;
     }
   }
@@ -114,6 +121,7 @@ class LineService {
       }
       return camelizeKeys(deletedLine.rows[0]);
     } catch (err) {
+      logger.logErrorWithoutRequest(err)
       throw err;
     }
   }

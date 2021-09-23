@@ -1,6 +1,7 @@
 const axios = require("axios")
 require("dotenv").config();
 const mapboxApiKey = process.env.MAPBOX_APP_SECRET
+const logger = require("../middleware/logger")
 
 const STARTING_URL = "https://api.mapbox.com/geocoding/v5/mapbox.places/";
 
@@ -25,6 +26,7 @@ class GeolocationService {
       });
       return suggestionsFromSearch
     } catch (err) {
+      logger.logErrorWithoutRequest(err)
       throw err
     }
   }
@@ -43,6 +45,7 @@ class GeolocationService {
       });
       return features
     } catch (err) {
+      logger.logErrorWithoutRequest(err)
       throw err
     }
   }

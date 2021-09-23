@@ -14,6 +14,7 @@ const client = new OAuth2Client(process.env.GOOGLE_APP_ID);
 const userService = new UserService();
 const minPasswordLength = 5;
 const { getAuth, signInWithCustomToken } = require("firebase/auth");
+const logger = require("../middleware/logger");
 
 function generateAccessToken(userId, res) {
   jwt.sign(
@@ -36,10 +37,10 @@ function generateAccessToken(userId, res) {
 
 router.get("/", auth, async (req, res, next) => {
   try {
-    console.log(req.user.userId);
     const user = await userService.findUserById(req.user.userId);
     res.json(user);
   } catch (err) {
+    logger.logError(req, err);
     next(err);
   }
 });
@@ -75,6 +76,7 @@ router.post(
       const user = await userService.createUser(email, name, password, null);
       generateAccessToken(user.userId, res);
     } catch (err) {
+      logger.logError(req, err);
       next(err);
     }
   }
@@ -118,9 +120,9 @@ router.post(
       if (!(await bcrypt.compare(password, user.password))) {
         throw new BadRequestError("Incorrect Password");
       }
-      console.log(user);
       generateAccessToken(user.userId, res);
     } catch (err) {
+      logger.logError(req, err);
       next(err);
     }
   }
@@ -142,10 +144,9 @@ router.post("/login/google", async (req, res, next) => {
     if (!user) {
       user = await userService.createUser(email, name, null, null);
     }
-    console.log(user);
     generateAccessToken(user.userId, res);
   } catch (err) {
-    console.log(err);
+    logger.logError(req, err);
     next(err);
   }
 });
@@ -157,14 +158,12 @@ const facebookAuth = passport.authenticate("facebook-token", {
 
 const fbLogin = (req, res, next) => {
   if (req.user) {
-    console.log(req.user);
     generateAccessToken(req.user.userId, res);
   }
 };
 
 const fbLoginError = (err, req, res, next) => {
   if (err) {
-    console.log("Error logging in via Facebook.");
     res.status(401).json({
       error: err,
     });
