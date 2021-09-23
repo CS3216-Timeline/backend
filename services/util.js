@@ -51,8 +51,8 @@ async function checkIfMemoryIsValidUserMemory(memoryId, userId) {
 }
 
 async function checkIfMediaIsValidUserMedia(mediaId, userId) {
-    const mediaInfo = await mediaService.getMediaWithMemoryAndLineInformation(memoryId);
-    return mediaInfo ["userId"] === userId;
+    const mediaInfo = await mediaService.getMediaWithMemoryAndLineInformation(mediaId);
+    return mediaInfo["userId"] === userId;
   }
 
 function isValidDate(year, month, day) {
