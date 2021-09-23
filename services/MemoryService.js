@@ -105,7 +105,7 @@ class MemoryService {
   async getNumberOfMemoriesByDays(userId, month, year) {
     try {
       const numberOfMemories = await pool.query(
-        `SELECT date_part('day',creation_date) as day, COUNT(memory_id) as number_of_memories
+        `SELECT date_part('day',creation_date) AS day, COUNT(memory_id) AS number_of_memories
           FROM memories M JOIN lines L ON M.line_id = L.line_id
           WHERE L.user_id = $1
           AND date_part('month',creation_date) = $2

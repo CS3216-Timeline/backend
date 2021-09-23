@@ -71,6 +71,29 @@ class MediaService {
     }
   }
 
+  async deleteMediaByLine(userId, lineId) {
+    try {
+      const deletedMedia = await pool.query(
+        `
+        DELETE FROM media D
+        WHERE EXISTS (
+          SELECT *
+          FROM memories M
+          JOIN lines L ON M.line_id = L.line_id
+          WHERE memory_id = D.memory_id
+          AND user_id = $1
+          AND L.line_id = $2
+        ) RETURNING *
+        `,
+        [userId, lineId]
+      );
+      return camelizeKeys(deletedMedia.rows);
+    } catch (err) {
+      logger.logErrorWithoutRequest(err);
+      throw err;
+    }
+  }
+
   async getMediaWithMemoryAndLineInformation(mediaId) {
     try {
       const media = await pool.query(
