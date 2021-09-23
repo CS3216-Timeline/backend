@@ -61,12 +61,14 @@ router.post(
 
 router.get("/:lineId", auth, async (req, res, next) => {
   const { lineId } = req.params;
+  const { userId } = req.user;
 
   try {
     let line = {};
     if (req.query.includeMemories == "true") {
       let lineWithMemories =
         await lineService.getLineByLineIdWithMemoriesOrderByCreationDate(
+          userId,
           lineId
         );
       line.lineId = lineWithMemories[0].lineId;
@@ -91,16 +93,12 @@ router.get("/:lineId", auth, async (req, res, next) => {
         });
       }
     } else {
-      line = await lineService.getLineByLineId(lineId);
+      line = await lineService.getLineByLineId(userId, lineId);
     }
 
-    if (line.userId == req.user.userId) {
-      res.status(200).json({
-        line,
-      });
-    } else {
-      throw new UnauthorizedError("You do not have access to this line");
-    }
+    res.status(200).json({
+      line,
+    });
   } catch (err) {
     logger.logError(req, err);
     next(err);

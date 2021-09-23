@@ -2,7 +2,7 @@ const pool = require("../db/db");
 const camelizeKeys = require("../db/utils");
 const { snakeCase } = require("lodash");
 const { NotFoundError } = require("../errors/errors");
-const logger = require("../middleware/logger")
+const logger = require("../middleware/logger");
 
 class LineService {
   constructor() {}
@@ -15,22 +15,23 @@ class LineService {
       );
       return camelizeKeys(newLine.rows[0]);
     } catch (err) {
-      logger.logErrorWithoutRequest(err)
+      logger.logErrorWithoutRequest(err);
       throw err;
     }
   }
 
-  async getLineByLineId(lineId) {
+  async getLineByLineId(userId, lineId) {
     try {
-      const lines = await pool.query("SELECT * FROM lines WHERE line_id = $1", [
-        lineId,
-      ]);
+      const lines = await pool.query(
+        "SELECT * FROM lines WHERE line_id = $1 AND user_id = $2",
+        [lineId, userId]
+      );
       if (!lines.rows[0]) {
         throw new NotFoundError("Line does not exist");
       }
       return camelizeKeys(lines.rows[0]);
     } catch (err) {
-      logger.logErrorWithoutRequest(err)
+      logger.logErrorWithoutRequest(err);
       throw err;
     }
   }
@@ -42,27 +43,27 @@ class LineService {
       ]);
       return camelizeKeys(lines.rows);
     } catch (err) {
-      logger.logErrorWithoutRequest(err)
+      logger.logErrorWithoutRequest(err);
       throw err;
     }
   }
 
-  async getLineByLineIdWithMemoriesOrderByCreationDate(lineId) {
+  async getLineByLineIdWithMemoriesOrderByCreationDate(userId, lineId) {
     try {
       const lineWithMemories = await pool.query(
         `SELECT L.*, M.memory_id, M.title, M.description, M.creation_date, M.latitude, M.longitude, (
           SELECT url FROM media WHERE memory_id = M.memory_id ORDER BY position LIMIT 1
         ) as thumbnail_url
         FROM lines L LEFT JOIN memories M ON L.line_id = M.line_id
-        WHERE L.line_id = $1 ORDER BY M.creation_date DESC`,
-        [lineId]
+        WHERE L.line_id = $1 AND L.user_id = $2 ORDER BY M.creation_date DESC`,
+        [lineId, userId]
       );
       if (!lineWithMemories.rows[0]) {
         throw new NotFoundError("Line does not exist");
       }
       return camelizeKeys(lineWithMemories.rows);
     } catch (err) {
-      logger.logErrorWithoutRequest(err)
+      logger.logErrorWithoutRequest(err);
       throw err;
     }
   }
@@ -84,7 +85,7 @@ class LineService {
       );
       return camelizeKeys(lines.rows);
     } catch (err) {
-      logger.logErrorWithoutRequest(err)
+      logger.logErrorWithoutRequest(err);
       throw err;
     }
   }
@@ -103,7 +104,7 @@ class LineService {
       }
       return camelizeKeys(updatedLine.rows[0]);
     } catch (err) {
-      logger.logErrorWithoutRequest(err)
+      logger.logErrorWithoutRequest(err);
       throw err;
     }
   }
@@ -121,7 +122,7 @@ class LineService {
       }
       return camelizeKeys(deletedLine.rows[0]);
     } catch (err) {
-      logger.logErrorWithoutRequest(err)
+      logger.logErrorWithoutRequest(err);
       throw err;
     }
   }
