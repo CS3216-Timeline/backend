@@ -23,7 +23,7 @@ const upload = multer();
 router.post(
   "/",
   auth,
-  upload.array("images", 10),
+  upload.array("images", process.env.MAX_MEDIA_PER_MEMORY),
   [check("memoryId", "Memory Id cannot be blank").notEmpty()],
   async (req, res, next) => {
     try {
@@ -45,14 +45,20 @@ router.post(
       }
 
       let curMedia = await mediaService.getAllMediaByMemory(memoryId);
-      const offset = curMedia.length;
       const images = req.files;
-      for (let i = 0; i < images.length; i++) {
+      const initialLength = curMedia.length;
+      const addedLength = images.length
+
+      if (initialLength + addedLength > process.env.MAX_MEDIA_PER_MEMORY) {
+        throw new BadRequestError("Exceeded maximum number of media for this memory");
+      }
+      
+      for (let i = 0; i < addedLength; i++) {
         const url = await storageService.uploadImage(images[i]);
         const newMedia = await mediaService.createMedia(
           url,
           memoryId,
-          offset + i
+          initialLength + i
         );
         curMedia.push(newMedia);
       }

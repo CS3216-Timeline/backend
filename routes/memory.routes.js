@@ -24,11 +24,9 @@ const logger = require("../middleware/logger");
 router.post(
   "/",
   auth,
-  upload.array("images", 10),
+  upload.array("images", process.env.MAX_MEDIA_PER_MEMORY),
   [
-    //TODO: Check which fields are necessary
     check("title", "Title of memory cannot be blank").notEmpty(),
-    check("description", "Description cannot be blank").exists(),
     check("line", "Line cannot be blank").exists(),
     check("latitude", "Latitude cannot be blank").exists(),
     check("longitude", "Longitude cannot be blank").exists(),
@@ -193,7 +191,6 @@ router.patch(
     oneOf(
       [
         check("title", "Title of memory cannot be blank").notEmpty(),
-        check("description", "Description cannot be blank").notEmpty(),
         check("line", "Line cannot be blank").notEmpty(),
         check("latitude", "Latitude cannot be blank").notEmpty(),
         check("longitude", "Longitude cannot be blank").notEmpty(),
