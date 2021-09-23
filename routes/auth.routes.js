@@ -73,7 +73,7 @@ router.post(
 
       const { email, name, password } = req.body;
 
-      const user = await userService.createUser(email, name, password, null); // TODO: upload picture and get url
+      const user = await userService.createUser(email, name, password, null);
       generateAccessToken(user.userId, res);
     } catch (err) {
       logger.logError(req, err);
@@ -142,11 +142,11 @@ router.post("/login/google", async (req, res, next) => {
     const { name, email, picture } = ticket.getPayload();
     let user = await userService.findUserByEmail(email);
     if (!user) {
-      user = await userService.createUser(email, name, null, null); // TODO: upload picture and get url
+      user = await userService.createUser(email, name, null, null);
     }
     generateAccessToken(user.userId, res);
   } catch (err) {
-    logger.logError(req, err)
+    logger.logError(req, err);
     next(err);
   }
 });
@@ -159,7 +159,6 @@ const facebookAuth = passport.authenticate("facebook-token", {
 const fbLogin = (req, res, next) => {
   if (req.user) {
     generateAccessToken(req.user.userId, res);
-    // generateAccessToken(req.authInfo.userId, res);
   }
 };
 
