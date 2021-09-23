@@ -71,7 +71,6 @@ router.post(
         );
         memoryMedia.push(media);
       }
-
       memory["media"] = memoryMedia;
 
       res.status(200).json({

@@ -95,7 +95,6 @@ router.delete("/:mediaId", auth, async (req, res, next) => {
   try {
     const { userId } = req.user;
     const { mediaId } = req.params;
-    const { memoryId } = req.body;
 
     if (!(await checkIfMediaExists(mediaId))) {
       throw new BadRequestError("Media does not exist");
@@ -106,10 +105,10 @@ router.delete("/:mediaId", auth, async (req, res, next) => {
     }
 
     const deletedMedia = await mediaService.deleteMediaById(mediaId);
+    const memoryId = deletedMedia["memoryId"];
     const remainingMedia = await mediaService.getAllMediaByMemory(memoryId);
     let updates = [];
     const deletedPos = parseInt(deletedMedia["position"]);
-
     for (let i = 0; i < remainingMedia.length; i++) {
       pos = parseInt(remainingMedia[i]["position"]);
       if (pos > deletedPos) {
@@ -136,7 +135,7 @@ router.delete("/:mediaId", auth, async (req, res, next) => {
 router.post(
   "/positions",
   auth,
-  [check("updates", "At least one position needs to be updated").notEmpty()],
+  [check("updates", "At least one position needs to be updated").isArray({min: 1})],
   async (req, res, next) => {
     try {
       const errors = validationResult(req);
