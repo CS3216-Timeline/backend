@@ -43,7 +43,7 @@ async function checkIfUserIsMemoryOwner(userId, memoryId) {
 }
 
 async function checkIfUserIsLineOwner(userId, lineId) {
-  const line = await lineService.getLineByLineId(lineId);
+  const line = await lineService.getLineByLineId(userId, lineId);
   if (!line) {
     return false;
   }
