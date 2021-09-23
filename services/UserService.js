@@ -89,9 +89,6 @@ class UserService {
       `,
         [name, pictureUrl, hashedPassword, userId]
       );
-      if (!updatedUser.rows[0]) {
-        throw new NotFoundError("User does not exist");
-      }
 
       return camelizeKeys(updatedUser.rows[0]);
     } catch (err) {
