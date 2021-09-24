@@ -5,7 +5,6 @@ const authRoutes = require("./auth.routes");
 const lineRoutes = require("./line.routes");
 const memoryRoutes = require("./memory.routes");
 const debugRoutes = require("./debug.routes");
-const geolocationRoutes = require("./geolocation.routes");
 const mediaRoutes = require("./media.routes");
 
 const router = express.Router();
@@ -26,10 +25,6 @@ const routes = [
   {
     path: "/memories",
     route: memoryRoutes,
-  },
-  {
-    path: "/geolocation",
-    route: geolocationRoutes,
   },
   {
     path: "/media",
