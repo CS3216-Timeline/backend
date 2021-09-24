@@ -23,7 +23,8 @@ function generateAccessToken(userId, res) {
     },
     (err, token) => {
       if (err) {
-        throw new UnauthorizedError("user unauthorized");
+        logger.logErrorWithoutRequest(err);
+        throw err;
       }
       res.json({
         token,
