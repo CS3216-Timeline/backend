@@ -23,7 +23,8 @@ function generateAccessToken(userId, res) {
     },
     (err, token) => {
       if (err) {
-        throw new UnauthorizedError("user unauthorized");
+        logger.logErrorWithoutRequest(err);
+        throw err;
       }
       res.json({
         token,
@@ -61,6 +62,7 @@ router.post(
       const { email, name, password } = req.body;
 
       const user = await userService.createUser(email, name, password, null);
+      res.status(201);
       generateAccessToken(user.userId, res);
     } catch (err) {
       logger.logError(req, err);

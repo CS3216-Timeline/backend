@@ -64,7 +64,7 @@ router.post(
         curMedia.push(newMedia);
       }
 
-      res.status(200).json({
+      res.status(201).json({
         media: curMedia,
       });
     } catch (err) {
@@ -133,45 +133,5 @@ router.delete("/:mediaId", auth, async (req, res, next) => {
     next(err);
   }
 });
-
-router.post(
-  "/positions",
-  auth,
-  [
-    check("updates", "At least one position needs to be updated").isArray({
-      min: 1,
-    }),
-  ],
-  async (req, res, next) => {
-    try {
-      const errors = validationResult(req);
-      if (!errors.isEmpty()) {
-        throw new BadRequestError(
-          errors
-            .array()
-            .map((err) => err.msg)
-            .join(", ")
-        );
-      }
-
-      const { userId } = req.user;
-      const { memoryId, updates } = req.body;
-
-      if (!(await checkIfMemoryIsValidUserMemory(memoryId, userId))) {
-        throw new NotFoundError("Memory does not exist");
-      }
-
-      await mediaService.updatePositions(updates);
-
-      res.status(200).json({
-        memoryId: memoryId,
-        updates: updates,
-      });
-    } catch (err) {
-      logger.logError(req, err);
-      next(err);
-    }
-  }
-);
 
 module.exports = router;

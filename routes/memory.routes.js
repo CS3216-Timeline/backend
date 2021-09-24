@@ -59,6 +59,11 @@ router.post(
 
       const images = req.files;
       let memoryMedia = [];
+
+      if (!images) {
+        throw new BadRequestError("Please upload at least one image");
+      }
+
       for (let i = 0; i < images.length; i++) {
         const url = await storageService.uploadImage(images[i]);
         const media = await mediaService.createMedia(
@@ -70,7 +75,7 @@ router.post(
       }
       memory["media"] = memoryMedia;
 
-      res.status(200).json({
+      res.status(201).json({
         memory,
       });
     } catch (err) {
