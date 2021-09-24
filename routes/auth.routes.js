@@ -5,15 +5,13 @@ const { check, validationResult } = require("express-validator");
 const bcrypt = require("bcryptjs");
 const { BadRequestError, UnauthorizedError } = require("../errors/errors");
 const UserService = require("../services/UserService");
-const auth = require("../middleware/auth");
 const passport = require("passport");
 require("dotenv").config();
 const { OAuth2Client } = require("google-auth-library");
 const client = new OAuth2Client(process.env.GOOGLE_APP_ID);
 const userService = new UserService();
 const minPasswordLength = 5;
-const { getAuth, signInWithCustomToken } = require("firebase/auth");
-const logger = require("../middleware/logger");
+const logger = require("../logs/logger");
 
 function generateAccessToken(userId, res) {
   jwt.sign(

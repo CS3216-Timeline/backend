@@ -1,3 +1,0 @@
-/*
-  To setup tables, triggers, inserting mock data, views, etc...
-*/

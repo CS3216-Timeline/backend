@@ -1,19 +1,15 @@
 const express = require("express");
 const router = express.Router();
-const config = require("config");
-const jwt = require("jsonwebtoken");
 const { check, oneOf, validationResult } = require("express-validator");
 const bcrypt = require("bcryptjs");
-const { BadRequestError, UnauthorizedError } = require("../errors/errors");
+const { BadRequestError } = require("../errors/errors");
 const auth = require("../middleware/auth");
 require("dotenv").config();
-const { OAuth2Client } = require("google-auth-library");
-const client = new OAuth2Client(process.env.GOOGLE_APP_ID);
 const minPasswordLength = 5;
 
 const UserService = require("../services/UserService");
 const userService = new UserService();
-const logger = require("../middleware/logger");
+const logger = require("../logs/logger");
 
 router.get("/", auth, async (req, res, next) => {
   try {

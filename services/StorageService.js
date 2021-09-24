@@ -7,7 +7,7 @@ const {
 } = require("firebase/storage");
 const { v4: uuidv4 } = require("uuid");
 require("dotenv").config();
-const logger = require("../middleware/logger");
+const logger = require("../logs/logger");
 
 const firebaseConfig = {
   apiKey: process.env.FIREBASE_API_KEY,

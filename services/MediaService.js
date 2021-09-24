@@ -1,7 +1,7 @@
 const pool = require("../db/db");
 const camelizeKeys = require("../db/utils");
 const { BadRequestError } = require("../errors/errors");
-const logger = require("../middleware/logger");
+const logger = require("../logs/logger");
 
 class MediaService {
   constructor() {}
