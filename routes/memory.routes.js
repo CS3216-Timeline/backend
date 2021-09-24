@@ -18,7 +18,7 @@ const {
   isValidDate,
 } = require("../services/util");
 const upload = multer();
-const logger = require("../logs/logger")
+const logger = require("../logs/logger");
 
 router.post(
   "/",
@@ -46,7 +46,7 @@ router.post(
       const { title, line, description, latitude, longitude } = req.body;
 
       if (!(await checkIfUserIsLineOwner(userId, line))) {
-        throw new NotFoundError("Line not found");
+        throw new NotFoundError("Line does not exist");
       }
 
       const memory = await memoryService.createMemory(
@@ -135,7 +135,7 @@ router.get("/:memoryId", auth, async (req, res, next) => {
     const { memoryId } = req.params;
 
     if (!(await checkIfMemoryIsValidUserMemory(memoryId, userId))) {
-      throw new NotFoundError("Memory not found");
+      throw new NotFoundError("Memory does not exist");
     }
 
     const memory = await memoryService.getMemoryByMemoryId(memoryId);
@@ -156,7 +156,7 @@ router.delete("/:memoryId", auth, async (req, res, next) => {
     const { memoryId } = req.params;
 
     if (!(await checkIfMemoryIsValidUserMemory(memoryId, userId))) {
-      throw new NotFoundError("Memory not found");
+      throw new NotFoundError("Memory does not exist");
     }
 
     const deletedMedia = await mediaService.deleteMediaByMemory(memoryId);
@@ -167,7 +167,7 @@ router.delete("/:memoryId", auth, async (req, res, next) => {
 
     const deletedMemory = await memoryService.deleteMemoryById(memoryId);
     if (!deletedMemory) {
-      throw new NotFoundError("Memory not found");
+      throw new NotFoundError("Memory does not exist");
     }
     deletedMemory["media"] = deletedMedia;
     res.status(200).json({
@@ -210,7 +210,7 @@ router.patch(
       const { title, line, description, latitude, longitude } = req.body;
 
       if (!(await checkIfMemoryIsValidUserMemory(memoryId, userId))) {
-        throw new NotFoundError("Memory not found");
+        throw new NotFoundError("Memory does not exist");
       }
 
       const memory = await memoryService.updateMemory(

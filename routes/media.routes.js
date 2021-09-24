@@ -37,7 +37,7 @@ router.post(
       const { memoryId } = req.body;
 
       if (!(await checkIfMemoryIsValidUserMemory(memoryId, userId))) {
-        throw new NotFoundError("Memory not found");
+        throw new NotFoundError("Memory does not exist");
       }
 
       let curMedia = await mediaService.getAllMediaByMemory(memoryId);
@@ -158,7 +158,7 @@ router.post(
       const { memoryId, updates } = req.body;
 
       if (!(await checkIfMemoryIsValidUserMemory(memoryId, userId))) {
-        throw new NotFoundError("Memory not found");
+        throw new NotFoundError("Memory does not exist");
       }
 
       await mediaService.updatePositions(updates);
