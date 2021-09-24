@@ -61,6 +61,7 @@ router.post(
       const { email, name, password } = req.body;
 
       const user = await userService.createUser(email, name, password, null);
+      res.status(201);
       generateAccessToken(user.userId, res);
     } catch (err) {
       logger.logError(req, err);

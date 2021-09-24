@@ -14,7 +14,9 @@ const logger = require("../logs/logger");
 router.get("/", auth, async (req, res, next) => {
   try {
     const user = await userService.findUserById(req.user.userId);
-    res.json(user);
+    res.status(200).json({
+      user,
+    });
   } catch (err) {
     logger.logError(req, err);
     next(err);
@@ -22,12 +24,9 @@ router.get("/", auth, async (req, res, next) => {
 });
 
 router.patch(
-  "/profile",
+  "/",
   auth,
-  oneOf(
-    [check("name").not().isEmpty().isString(), check("picture").exists()],
-    "At least one field must be given."
-  ),
+  check("name", "Please fill in your name").not().isEmpty().isString(),
   async (req, res, next) => {
     const errors = validationResult(req);
     try {
@@ -41,11 +40,11 @@ router.patch(
         );
       }
       const { userId } = req.user;
-      const { name, picture } = req.body;
+      const { name } = req.body;
       const user = await userService.updateUserDetails(
         userId,
         name,
-        picture,
+        null,
         null
       );
       if (!user) {
@@ -114,7 +113,7 @@ router.post(
       if (!user) {
         throw new NotFoundError("User does not exist");
       }
-      res.status(200).end();
+      res.status(204).end();
     } catch (err) {
       logger.logError(req, err);
       next(err);
@@ -122,11 +121,11 @@ router.post(
   }
 );
 
-router.delete("/delete", auth, async (req, res, next) => {
+router.delete("/", auth, async (req, res, next) => {
   try {
     const { userId } = req.user;
     const user = await userService.deleteUserByUserId(userId);
-    res.status(200).end();
+    res.status(204).end();
   } catch (err) {
     logger.logError(req, err);
     next(err);
