@@ -1,6 +1,7 @@
 const pool = require("../db/db");
 const camelizeKeys = require("../db/utils");
 const logger = require("../middleware/logger");
+const { BadRequestError } = require("../errors/errors");
 
 class LineService {
   constructor() {}
@@ -14,7 +15,7 @@ class LineService {
       return camelizeKeys(newLine.rows[0]);
     } catch (err) {
       logger.logErrorWithoutRequest(err);
-      throw err;
+      throw new BadRequestError("A line with the same name already exists");
     }
   }
 
@@ -48,7 +49,7 @@ class LineService {
       const lineWithMemories = await pool.query(
         `SELECT L.*, M.memory_id, M.title, M.description, M.creation_date, M.latitude, M.longitude, (
           SELECT url FROM media WHERE memory_id = M.memory_id ORDER BY position LIMIT 1
-        ) as thumbnail_url
+        ) AS thumbnail_url
         FROM lines L LEFT JOIN memories M ON L.line_id = M.line_id
         WHERE L.line_id = $1 AND L.user_id = $2 ORDER BY M.creation_date DESC`,
         [lineId, userId]
@@ -92,7 +93,7 @@ class LineService {
       return camelizeKeys(updatedLine.rows[0]);
     } catch (err) {
       logger.logErrorWithoutRequest(err);
-      throw err;
+      throw new BadRequestError("A line with the same name already exists");
     }
   }
 

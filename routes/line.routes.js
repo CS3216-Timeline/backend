@@ -9,6 +9,10 @@ const {
 const auth = require("../middleware/auth");
 const LineService = require("../services/LineService");
 const lineService = new LineService();
+const MediaService = require("../services/MediaService");
+const mediaService = new MediaService();
+const StorageService = require("../services/StorageService");
+const storageService = new StorageService();
 const logger = require("../middleware/logger");
 
 // TODO: Check whether we should return sorted or unsorted response
@@ -34,7 +38,9 @@ router.post(
   auth,
   [
     check("lineName", "Line name cannot be blank").exists(),
-    check("colorHex", "Line color cannot be blank").exists(),
+    check("colorHex", "Line color must be a valid 6 digit hex")
+      .exists()
+      .matches(/^[a-f0-9]{6}$/),
   ],
   async (req, res, next) => {
     const errors = validationResult(req);
@@ -119,7 +125,12 @@ router.patch(
   "/:lineId",
   auth,
   oneOf(
-    [check("lineName").exists(), check("colorHex").exists()],
+    [
+      check("lineName").exists(),
+      check("colorHex")
+        .exists()
+        .matches(/^[a-f0-9]{6}$/),
+    ],
     "At least one field must be given."
   ),
   async (req, res, next) => {
@@ -165,6 +176,11 @@ router.delete("/:lineId", auth, async (req, res, next) => {
   try {
     const { userId } = req.user;
     const { lineId } = req.params;
+    const deletedMedia = await mediaService.deleteMediaByLine(userId, lineId);
+    for (let i = 0; i < deletedMedia.length; i++) {
+      const url = deletedMedia[i]["url"];
+      await storageService.deleteImage(url);
+    }
     const line = await lineService.deleteLineByLineId(lineId, userId);
 
     if (!line) {
