@@ -13,7 +13,7 @@ const MediaService = require("../services/MediaService");
 const mediaService = new MediaService();
 const StorageService = require("../services/StorageService");
 const storageService = new StorageService();
-const logger = require("../middleware/logger");
+const logger = require("../logs/logger");
 
 // TODO: Check whether we should return sorted or unsorted response
 // Can potentially have a query parameter for them to choose

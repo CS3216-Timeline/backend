@@ -1,7 +1,7 @@
 const { Strategy: JwtStrategy, ExtractJwt } = require("passport-jwt");
 const FacebookTokenStrategy = require("passport-facebook-token");
 const UserService = require("../services/UserService");
-const logger = require("../middleware/logger");
+const logger = require("../logs/logger");
 require("dotenv").config();
 
 const userService = new UserService();

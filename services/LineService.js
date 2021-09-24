@@ -1,6 +1,6 @@
 const pool = require("../db/db");
 const camelizeKeys = require("../db/utils");
-const logger = require("../middleware/logger");
+const logger = require("../logs/logger");
 const { BadRequestError } = require("../errors/errors");
 
 class LineService {

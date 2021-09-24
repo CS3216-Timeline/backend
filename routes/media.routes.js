@@ -3,7 +3,7 @@ const router = express.Router();
 const { check, validationResult } = require("express-validator");
 const { BadRequestError, NotFoundError } = require("../errors/errors");
 const auth = require("../middleware/auth");
-const logger = require("../middleware/logger");
+const logger = require("../logs/logger");
 
 const multer = require("multer");
 const {

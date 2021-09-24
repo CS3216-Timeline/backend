@@ -18,7 +18,7 @@ const {
   isValidDate,
 } = require("../services/util");
 const upload = multer();
-const logger = require("../middleware/logger");
+const logger = require("../logs/logger")
 
 router.post(
   "/",

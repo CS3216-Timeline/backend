@@ -13,7 +13,7 @@ const minPasswordLength = 5;
 
 const UserService = require("../services/UserService");
 const userService = new UserService();
-const logger = require("../middleware/logger");
+const logger = require("../logs/logger");
 
 router.get("/", auth, async (req, res, next) => {
   try {
