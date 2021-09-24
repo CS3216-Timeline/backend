@@ -47,7 +47,7 @@ async function checkIfUserIsLineOwner(userId, lineId) {
   if (!line) {
     return false;
   }
-  
+
   return line.userId === userId;
 }
 
@@ -58,7 +58,7 @@ async function numberOfMediaInMemory(memoryId) {
 
 async function checkIfMemoryIsValidUserMemory(memoryId, userId) {
   const memoryInfo = await memoryService.getMemoryWithLineInformation(memoryId);
-  if (!memoryInfo) {
+  if (!memoryInfo[0]) {
     return false;
   }
   return memoryInfo[0].userId === userId;
@@ -68,7 +68,7 @@ async function checkIfMediaIsValidUserMedia(mediaId, userId) {
   const mediaInfo = await mediaService.getMediaWithMemoryAndLineInformation(
     mediaId
   );
-  if (!mediaInfo) {
+  if (!mediaInfo[0]) {
     return false;
   }
   return mediaInfo[0].userId === userId;
