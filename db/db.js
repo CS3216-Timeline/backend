@@ -1,8 +1,5 @@
 const Pool = require("pg").Pool;
 require("dotenv").config();
-// This only sets up locally, probably need a devconfig and production config.
-// connect to postgres using psql -U postgres
-// connect to database using \c pern_starter
 
 const devConfig = {
   user: process.env.PG_USER,

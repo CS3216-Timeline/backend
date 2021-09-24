@@ -4,7 +4,6 @@ const cors = require("cors");
 const xss = require("xss-clean");
 const passport = require("passport");
 const { jwtStrategy, facebookStrategy } = require("./config/passport");
-const config = require("config");
 
 const routes = require("./routes/");
 const { HTTPError } = require("./errors/errors");
@@ -28,7 +27,6 @@ app.use(
   })
 );
 
-// jwt authentication
 app.use(passport.initialize());
 passport.use("jwt", jwtStrategy);
 passport.use(facebookStrategy);

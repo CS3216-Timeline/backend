@@ -3,7 +3,6 @@ const router = express.Router();
 const { check, oneOf, validationResult } = require("express-validator");
 const {
   BadRequestError,
-  UnauthorizedError,
   NotFoundError,
 } = require("../errors/errors");
 const auth = require("../middleware/auth");
@@ -15,8 +14,6 @@ const StorageService = require("../services/StorageService");
 const storageService = new StorageService();
 const logger = require("../logs/logger");
 
-// TODO: Check whether we should return sorted or unsorted response
-// Can potentially have a query parameter for them to choose
 router.get("/", auth, async (req, res, next) => {
   const { userId } = req.user;
   try {
